@@ -1,19 +1,14 @@
-// 0, 1, 1, 2, 3, 5, 8, 13, 21 ...
-
-process fibonacci(int first, int second, int end){
-     String func(){
-          print(first);
-          is (first == 0){ //base case
-              fibonacci(1, 1, end);
-          }
-          is (first > end){ // to prevent infinite
-               emit done("complete");
-          }
-
-          fibonacci(second, first+second, end);
-      }
+process fibonacci(int n) {
+    int func() {
+        is (n <= 1) {  // Base case: if n is 0 or 1
+            emit result(n);  // Emit n as the result
+        }
+        is (n > 1) {  // Recursive case: if n is greater than 1
+            emit result(fibonacci(n - 1) + fibonacci(n - 2));  // Emit the sum of the two preceding Fibonacci numbers
+        }
+    }
 }
 
-main(){
-     fibonacci(first: 0, second: 0, end: 21) -> print(done);
+main() {
+    fibonacci(n: 5) -> print(result);  // Calculate the 5th Fibonacci number and print it
 }
