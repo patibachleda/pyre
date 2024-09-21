@@ -3,6 +3,7 @@
 ### pyre is a language that is focused on simplifying process flows in a language. 
 
 #### Grammar
+```text
 <Program> ::= <Process>* <Main>
 
 <Process> ::= "process" IDENTIFIER "(" <ArgList> ")" "{" <Function> <Helper>* "}"
@@ -62,3 +63,4 @@
 <NamedArg> ::= IDENTIFIER ":" IDENTIFIER
 
 <Type> ::= "int" | "double" |  "boolean" | "string" |  "char" | IDENTIFIER
+```
