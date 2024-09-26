@@ -3,6 +3,10 @@ process add(int a, int b){
           paramsInBoundCheck()
           is (isParamInBound){
                emit data1(a+b);
+          } elis (<some other thing>){
+           // do stuff
+          } else {
+           // do something else
           }
           
           emit data1(a+a);

@@ -2,10 +2,23 @@
 #define LEXER_H
 #include "token.h"
 
-typedef struct KEYWORD_STRUCTS {
-     char* keyword;
-     int type;
-} keyword_T;
+static const struct {
+	const char* value;
+	int type;
+} keywords[] = {
+	{"and",     TOKEN_AND},
+	{"or",    TOKEN_OR},
+	{"is",       TOKEN_IS},
+	{"elis",     TOKEN_ELIS},
+	{"else",     TOKEN_ELSE},
+	{"process",    TOKEN_PROCESS},
+	{"func",      TOKEN_FUNC},
+	{"main",       TOKEN_MAIN},
+	{"helper",      TOKEN_HELPER},
+	{"while",      TOKEN_WHILE},
+	{"for",      TOKEN_FOR},
+	{"emit",    TOKEN_EMIT}
+};
 
 typedef struct LEXER_STRUCT {
      char* current_char;

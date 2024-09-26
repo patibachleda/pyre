@@ -1,4 +1,4 @@
-# pyre
+﻿# pyre
 
 ### pyre is a language that is focused on simplifying process flows in a language. 
 
@@ -58,7 +58,7 @@
 
 <FuncCall> ::= IDENTIFIER "(" <ArgList> ")"
 
-<ArgList> ::= <Arg> ("," <Arg>)* | ?
+<ArgList> ::= <Arg> ("," <Arg>)* | ε
 
 <NamedArg> ::= IDENTIFIER ":" IDENTIFIER
 

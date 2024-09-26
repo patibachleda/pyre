@@ -3,54 +3,51 @@
 typedef struct TOKEN_STRUCT {
      enum {
           // Literals
-          TOKEN_ID, // 1
+          TOKEN_ID, // 0
 
           // Keywords
-          TOKEN_AND, // 2
-          TOKEN_OR, // 3
-          TOKEN_IS, // 4
-          TOKEN_ELIS, // 5
-          TOKEN_ELSE, // 6
-          TOKEN_YES, // 7
-          TOKEN_NO, // 8
-          TOKEN_PROCESS, // 9
-          TOKEN_FUNC, // 10
-          TOKEN_MAIN, // 11
-          TOKEN_HELPER, // 12
-          TOKEN_WHILE, // 13
-          TOKEN_FOR, // 14
-          TOKEN_PRINT, // 15
-          TOKEN_EMIT, // 16
+          TOKEN_AND, // 1
+          TOKEN_OR, // 2
+          TOKEN_IS, // 3
+          TOKEN_ELIS, // 4
+          TOKEN_ELSE, // 5
+          TOKEN_PROCESS, // 6
+          TOKEN_FUNC, // 7
+          TOKEN_MAIN, // 8
+          TOKEN_HELPER, // 9
+          TOKEN_WHILE, // 10
+          TOKEN_FOR, // 11
+          TOKEN_EMIT, // 12
 
           // Arithmetic
-          TOKEN_EQUALS, // 17
-          TOKEN_GREATER, // 18
-          TOKEN_LESS, // 19
-          TOKEN_GREATER_EQUAL, // 20
-          TOKEN_LESS_EQUAL, // 21
-          TOKEN_EQUAL_EQUAL, // 22
-          TOKEN_BANG, // 23
-          TOKEN_BANG_EQUAL, // 24
-          TOKEN_PLUS, // 25
-          TOKEN_MINUS, // 26
-          TOKEN_STAR, // 27
-          TOKEN_DIVIDE, // 28
+          TOKEN_EQUALS, // 13
+          TOKEN_GREATER, // 14
+          TOKEN_LESS, // 15
+          TOKEN_GREATER_EQUAL, // 16
+          TOKEN_LESS_EQUAL, // 17
+          TOKEN_EQUAL_EQUAL, // 18
+          TOKEN_BANG, // 19
+          TOKEN_BANG_EQUAL, // 20
+          TOKEN_PLUS, // 21
+          TOKEN_MINUS, // 22
+          TOKEN_STAR, // 23
+          TOKEN_DIVIDE, // 24
 
           // Types
-          TOKEN_STRING, // 29
-          TOKEN_INT, // 30
-          TOKEN_DOUBLE, // 31
-          TOKEN_BOOLEAN, // 32
-          TOKEN_CHARACTER, // 33
+          TOKEN_STRING, // 25
+          TOKEN_INT, // 26
+          TOKEN_DOUBLE, // 27
+          TOKEN_BOOLEAN, // 28
+          TOKEN_CHARACTER, // 29
 
           // Syntax
-          TOKEN_SEMICOLON, // 34
-          TOKEN_COMMA, // 35
-          TOKEN_DOT, // 36
-          TOKEN_LPAREN, // 37
-          TOKEN_RPAREN, // 38
-          TOKEN_LCURLY, // 39
-          TOKEN_RCURLY, // 40
+          TOKEN_SEMICOLON, // 30
+          TOKEN_COMMA, // 31
+          TOKEN_DOT, // 32
+          TOKEN_LPAREN, // 33
+          TOKEN_RPAREN, // 34
+          TOKEN_LCURLY, // 35
+          TOKEN_RCURLY, // 36
 
      } type;
 

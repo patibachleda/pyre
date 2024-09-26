@@ -233,7 +233,12 @@ token_T* lexer_parse_identifier(lexer_T* lexer) {
           lexer_move_forward(lexer);
      }
 
-
+     // is it a keyword?
+     for (int i = 0; i < (sizeof(keywords) / sizeof(keywords[0])); i++) {
+          if (strcmp(keywords[i].value, identifier) == 0 ) {
+               return init_token(keywords[i].type, identifier, line_num);
+          }
+     }
 
      return init_token(TOKEN_ID, identifier, line_num);
 }
