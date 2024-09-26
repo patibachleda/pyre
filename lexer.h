@@ -1,1 +1,34 @@
-#if
+#ifndef LEXER_H
+#define LEXER_H
+#include "token.h"
+
+typedef struct KEYWORD_STRUCTS {
+     char* keyword;
+     int type;
+} keyword_T;
+
+typedef struct LEXER_STRUCT {
+     char* current_char;
+     unsigned int index;
+     char* contents;
+} lexer_T;
+
+
+lexer_T* init_lexer(char* contents); // creates lexer 
+
+void lexer_move_forward(lexer_T* lexer); // move our pointer to next character in content
+
+void lexer_skip_whitespace(lexer_T* lexer); // remove whitespace
+
+token_T* lexer_get_next_token(lexer_T* lexer); // get to next token in contents
+
+token_T* lexer_parse_string(lexer_T* lexer); // how should we parse stuff in "<text>"
+
+token_T* lexer_parse_number(lexer_T* lexer); // how should we parse stuff in "<text>"
+
+token_T* lexer_parse_identifier(lexer_T* lexer); // how should we parse stuff in "<text>"
+
+token_T* lexer_read_forward_with_token(lexer_T* lexer, token_T* token); // how should we parse stuff in "<text>"
+
+char* lexer_get_current_char_as_string(lexer_T* lexer); // return char c as a string
+#endif
