@@ -176,7 +176,7 @@ token_T* lexer_parse_string(lexer_T* lexer) {
 
      while (*lexer->current_char != '"') { // read everything inside of string
           char* s = lexer_get_current_char_as_string(lexer);
-          string = realloc(string, strlen(string) * strlen(s) + 1 * sizeof(char));
+          string = realloc(string, (strlen(string) + strlen(s) + 1) * sizeof(char));
           strcat(string, s);
 
           lexer_move_forward(lexer);
@@ -193,7 +193,7 @@ token_T* lexer_parse_number(lexer_T* lexer) {
 
      while (isdigit(*lexer->current_char)) { // read everything inside of string
           char* s = lexer_get_current_char_as_string(lexer);
-          string = realloc(string, strlen(string) * strlen(s) + 1 * sizeof(char));
+          string = realloc(string, (strlen(string) + strlen(s) + 1) * sizeof(char));
           strcat(string, s);
 
           lexer_move_forward(lexer);
@@ -202,13 +202,13 @@ token_T* lexer_parse_number(lexer_T* lexer) {
      // for doubles
      if (*lexer->current_char == '.') {
           char* s = lexer_get_current_char_as_string(lexer);
-          string = realloc(string, strlen(string) * strlen(s) + 1 * sizeof(char));
+          string = realloc(string, (strlen(string) + strlen(s) + 1) * sizeof(char));
           strcat(string, s);
 
           lexer_move_forward(lexer);
           while (isdigit(*lexer->current_char)) { // read everything inside of string
                char* s = lexer_get_current_char_as_string(lexer);
-               string = realloc(string, strlen(string) * strlen(s) + 1 * sizeof(char));
+               string = realloc(string, (strlen(string) + strlen(s) + 1) * sizeof(char));
                strcat(string, s);
 
                lexer_move_forward(lexer);
