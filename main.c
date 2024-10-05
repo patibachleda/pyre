@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
                          get_file_contents(argv[i])
                     );
                     parser_T* parser = init_parser(lexer);
+                    ast_T* root = parser_parse_statements(parser);
                }
                else {
                     printf("Usage: pyre <filename>\n");
