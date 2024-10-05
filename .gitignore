@@ -2,3 +2,4 @@
 *.vcxproj*
 .vs/
 x64/
+*.o
