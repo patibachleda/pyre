@@ -8,9 +8,11 @@
 
 <Process> ::= "process" IDENTIFIER "(" <ArgList> ")" "{" <Function> <Helper>* "}"
 
-<Main> ::= "main" "(" ")" "{" <Call> "}"
+<Main> ::= "main" "(" ")" "{" <Stmt>* "}"
 
-<Call> ::= IDENTIFIER "(" <ArgList>  ")" ("->" IDENTIFIER "(" <ArgList>  ")")*
+<ProcessCall> ::= IDENTIFIER "(" <ArgList>  ")" ("->" IDENTIFIER "(" <ArgList>  ")")*
+
+<ProcessCall> ::= IDENTIFIER "(" <ArgList>  ")" ("->" IDENTIFIER "(" <ArgList>  ")")*
 
 <Function> ::=  TYPE "func" "(" ")" "{" <Stmt>* "}"
 
@@ -19,9 +21,14 @@
 <Stmt> ::= <Emit>
          | <IfElse>
          | <Expr>
-         | <Helper>
+         | <Call>
+         | <VarDec>
+         | <ProcessCall>
+         | <HelperCall>
 
 <Emit> ::= "emit" IDENTIFIER "(" <Expr> ")"
+
+<VarDec> ::= <Type> IDENTIFIER "=" IDENTIFER
 
 <IfElse> ::= "is" "(" <BooleanExpr> ")" "{" "yes" "{" <Stmt>* "}" "no" "{" <Stmt>* "}" "}"
            | "is" "(" <BooleanExpr> ")" "{" <Stmt>* "}"
