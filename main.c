@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "lexer.h"
+#include "include/lexer.h"
+#include "include/parser.h"
 
 char* get_file_contents(const char* filepath)
 {
@@ -39,12 +40,7 @@ int main(int argc, char* argv[]) {
                     lexer_T* lexer = init_lexer(
                          get_file_contents(argv[i])
                     );
-
-                    token_T* token = (void*)0;
-
-                    while ((token = lexer_get_next_token(lexer)) != (void*)0) {
-                         printf("token %d %s %d \n", token->type, token->value, token->line);
-                    }
+                    parser_T* parser = init_parser(lexer);
                }
                else {
                     printf("Usage: pyre <filename>\n");

@@ -1,5 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include "lexer.h"
+#include "include/lexer.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>

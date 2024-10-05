@@ -50,10 +50,10 @@ typedef struct AST_STRUCT {
 
 
      //   AST_HELPER_DEFINITION,
-     char* helper_call_name;
-     struct AST_STRUCT* helper_call_args;
-     size_t helper_call_args_size;
-     struct AST_STRUCT* helper_call_body;
+     char* helper_definition_name;
+     struct AST_STRUCT* helper_definition_args;
+     size_t helper_definition_args_size;
+     struct AST_STRUCT* helper_definition_body;
 
      //   AST_HELPER_CALL,
      char* helper_call_name;
@@ -61,8 +61,8 @@ typedef struct AST_STRUCT {
      size_t helper_call_args_size;
 
      //   AST_STATEMENT,
-     char* process_call_name;
-     struct AST_STRUCT* process_call_value;
+     char* statement_name;
+     struct AST_STRUCT* statement_value;
 
      //   AST_EMIT,
      char* emit_name;
@@ -73,55 +73,52 @@ typedef struct AST_STRUCT {
      struct AST_STRUCT* variable_definition_value;
 
      //   AST_VARIABLE,
-     char* variable_name;
+     char* variable_name_value;
 
      //   AST_CONDITIONAL,
-     char* process_call_name;
+     char* conditional_name;
      struct AST_STRUCT* conditional_value;
 
      //   AST_BOOLEAN_EXPRESSION,
-     char* process_call_name;
-     struct AST_STRUCT* process_call_value;
+     char* boolean_expression_name;
+     struct AST_STRUCT* boolean_expression_value;
 
      //   AST_BOOLEAN_FACTOR,
-     char* process_call_name;
-     struct AST_STRUCT* process_call_value;
+     char* boolean_factor_name;
+     struct AST_STRUCT* boolean_factor_value;
 
      //   AST_COMPARISON,
-     char* process_call_name;
-     struct AST_STRUCT* process_call_value;
+     char* comparison_name;
+     struct AST_STRUCT* comparison_value;
 
      //   AST_COMPARISON_OPERATOR,
-     char* process_call_name;
-     struct AST_STRUCT* process_call_value;
+     char* comparison_operator_value;
 
      //   AST_BOOLEAN_LITERAL,
-     char* process_call_name;
-     struct AST_STRUCT* process_call_value;
+     char* boolean_literal_value;
 
      //   AST_EXPRESSION,
-     char* process_call_name;
-     struct AST_STRUCT* process_call_value;
+     char* expression_name;
+     struct AST_STRUCT* expression_value;
 
      //   AST_TERM,
-     char* process_call_name;
-     struct AST_STRUCT* process_call_value;
+     char* term_name;
+     struct AST_STRUCT* term_value;
 
      //   AST_FACTOR,
-     char* process_call_name;
-     struct AST_STRUCT* process_call_value;
+     char* factor_name;
+     struct AST_STRUCT* factor_value;
 
      //   AST_ARG_LIST,
-     char* process_call_name;
-     struct AST_STRUCT* process_call_value;
+     char* arg_list_name;
+     struct AST_STRUCT* arg_list_value;
 
      //   AST_NAMED_ARG,
-     char* process_call_name;
-     struct AST_STRUCT* process_call_value;
+     char* named_arg_name;
+     struct AST_STRUCT* named_arg_value;
 
      //   AST_TYPE,
-     char* process_call_name;
-     struct AST_STRUCT* process_call_value;
+     char* type_value;
 
      //   AST_STRING,
      char* string_value;

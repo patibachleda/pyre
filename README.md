@@ -12,7 +12,7 @@
 
 <ProcessCall> ::= IDENTIFIER "(" <ArgList>  ")" ("->" IDENTIFIER "(" <ArgList>  ")")*
 
-<ProcessCall> ::= IDENTIFIER "(" <ArgList>  ")" ("->" IDENTIFIER "(" <ArgList>  ")")*
+<HelperCall> ::= IDENTIFIER "(" <ArgList>  ")"
 
 <Function> ::=  TYPE "func" "(" ")" "{" <Stmt>* "}"
 
@@ -62,8 +62,6 @@
            | <FuncCall>
            | "-" <Factor>  // Unary negation
            | <BooleanExpr> // Boolean expressions as part of an expression
-
-<FuncCall> ::= IDENTIFIER "(" <ArgList> ")"
 
 <ArgList> ::= <Arg> ("," <Arg>)* | ε
 
