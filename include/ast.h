@@ -3,6 +3,67 @@
 
 #include <stdlib.h>
 
+typedef struct AST_NODE {
+     enum {
+          AST_MAIN,
+          AST_PROCESS_DEFINITION,
+          AST_FUNCTION_DEFINITION,
+          AST_PROCESS_CALL,
+          AST_HELPER_DEFINITION,
+          AST_HELPER_CALL,
+          AST_STATEMENT,
+          AST_EMIT,
+          AST_VARIABLE_DEFINITION,
+          AST_VARIABLE,
+          AST_CONDITIONAL,
+          AST_BOOLEAN_EXPRESSION,
+          AST_BOOLEAN_FACTOR,
+          AST_COMPARISON,
+          AST_COMPARISON_OPERATOR,
+          AST_BOOLEAN_LITERAL,
+          AST_EXPRESSION,
+          AST_TERM,
+          AST_FACTOR,
+          AST_ARG_LIST,
+          AST_NAMED_ARG,
+          AST_TYPE,
+          AST_STRING,
+          AST_LIST_OF_NODES,
+          AST_NOOP
+     } type;
+
+     union type {
+          struct AST_MAIN {};
+          struct AST_PROCESS_DEFINITION;
+          struct AST_FUNCTION_DEFINITION;
+          struct AST_PROCESS_CALL;
+          struct AST_HELPER_DEFINITION;
+          struct AST_HELPER_CALL;
+          struct AST_STATEMENT;
+          struct AST_EMIT;
+          struct AST_VARIABLE_DEFINITION;
+          struct AST_VARIABLE;
+          struct AST_CONDITIONAL;
+          struct AST_BOOLEAN_EXPRESSION;
+          struct AST_BOOLEAN_FACTOR;
+          struct AST_COMPARISON;
+          struct AST_COMPARISON_OPERATOR;
+          struct AST_BOOLEAN_LITERAL;
+          struct AST_EXPRESSION;
+          struct AST_TERM;
+          struct AST_FACTOR;
+          struct AST_ARG_LIST;
+          struct AST_NAMED_ARG;
+          struct AST_TYPE;
+          struct AST_STRING;
+          struct AST_LIST_OF_NODES;
+          struct AST_NOOP;
+     } data;
+     struct SCOPE_STRUCT* scope;
+} ast_T;
+
+
+
 typedef struct AST_STRUCT {
      enum {
           AST_MAIN,
