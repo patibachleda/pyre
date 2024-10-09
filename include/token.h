@@ -49,6 +49,12 @@ typedef struct TOKEN_STRUCT {
           TOKEN_LCURLY, // 35
           TOKEN_RCURLY, // 36
 
+          // Types
+          TOKEN_INT_TYPE, // 37
+          TOKEN_DOUBLE_TYPE, // 38
+          TOKEN_STRING_TYPE, // 39
+          TOKEN_CHAR_TYPE, // 40
+          TOKEN_BOOLEAN_TYPE //41
      } type;
 
      char* value;

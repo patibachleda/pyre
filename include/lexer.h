@@ -17,7 +17,12 @@ static const struct {
 	{"helper",      TOKEN_HELPER},
 	{"while",      TOKEN_WHILE},
 	{"for",      TOKEN_FOR},
-	{"emit",    TOKEN_EMIT}
+	{"emit",    TOKEN_EMIT},
+	{"int",	  TOKEN_INT_TYPE},
+		{"double",	  TOKEN_DOUBLE_TYPE},
+			{"string",	  TOKEN_STRING_TYPE},
+				{"char",	  TOKEN_CHAR_TYPE},
+					{"boolean",	  TOKEN_BOOLEAN_TYPE}
 };
 
 typedef struct LEXER_STRUCT {

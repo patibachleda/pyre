@@ -5,6 +5,7 @@
 #include "include/lexer.h"
 #include "include/parser.h"
 
+
 char* get_file_contents(const char* filepath)
 {
      char* buffer = 0;
@@ -40,8 +41,23 @@ int main(int argc, char* argv[]) {
                     lexer_T* lexer = init_lexer(
                          get_file_contents(argv[i])
                     );
+
+                    //token_T* token = (void*)0;
+
+                    //while ((token = lexer_get_next_token(lexer)) != (void*)0) {
+                    //     printf("token %d %s \n", token->type, token->value);
+                    //}
+
                     parser_T* parser = init_parser(lexer);
-                    ast_T* root = parser_parse_statements(parser);
+                    ast_T** list = parser_parse_statements(parser);
+
+                    for (int i = 0; i < 10; i++) {
+                         printf("ast %s %s", list[i]->type, list[i]->data);
+                    }
+
+                    free(parser);
+                    free(list);
+
                }
                else {
                     printf("Usage: pyre <filename>\n");

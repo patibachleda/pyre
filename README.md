@@ -30,8 +30,8 @@
 
 <VarDec> ::= <Type> IDENTIFIER "=" IDENTIFER
 
-<IfElse> ::= "is" "(" <BooleanExpr> ")" "{" "yes" "{" <Stmt>* "}" "no" "{" <Stmt>* "}" "}"
-           | "is" "(" <BooleanExpr> ")" "{" <Stmt>* "}"
+<Conditional> ::= "is" "(" <BooleanExpr> ")" "{" "yes" "{" <Stmt>* "}" "no" "{" <Stmt>* "}" "}"
+               | "is" "(" <BooleanExpr> ")" "{" <Stmt>* "}"
 
 
 <BooleanExpr> ::= <BooleanTerm> ("or" <BooleanTerm>)*

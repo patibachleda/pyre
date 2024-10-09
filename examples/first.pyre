@@ -1,14 +1,7 @@
 main(){
      int a = 3;
-     if (a == 3.2){
-          print(a);
-          >=
-          // comments get ignored
-          <=
-          !=
-          >
-          <
-          !
-          // comments get ingnored
-     }
+     int b = 4;
+     // if (a == 3.2){
+     //     print(a);
+     // }
 }
