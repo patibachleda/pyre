@@ -10,7 +10,7 @@ struct AST_NODE {
      enum {
           AST_MAIN,
           AST_PROCESS_DEFINITION,
-          AST_FUNCTION_DEFINITION,
+          AST_FUNC_DEFINITION,
           AST_PROCESS_CALL,
           AST_HELPER_DEFINITION,
           AST_HELPER_CALL,
@@ -31,27 +31,27 @@ struct AST_NODE {
           AST_NAMED_ARG,
           AST_TYPE,
           AST_STRING,
+          AST_INT,
           AST_LIST_OF_NODES,
           AST_NOOP
      } type;
 
      union type {
-          struct AST_MAIN { ast_T** statements; } ast_main;
-          //struct AST_PROCESS_DEFINITION {};
-          //struct AST_FUNCTION_DEFINITION {};
+          struct AST_MAIN { ast_T** body; } ast_main;
+          struct AST_PROCESS_DEFINITION { char* name; ast_T** body; } ast_process_definition;
+          struct AST_FUNC_DEFINITION { ast_T** body; } ast_func_definition;
           //struct AST_PROCESS_CALL {};
           //struct AST_HELPER_DEFINITION {};
           //struct AST_HELPER_CALL {};
           //struct AST_STATEMENT {};
           //struct AST_EMIT {};
-          struct AST_VARIABLE_DEFINITION { char* type; char* name; char* value; } ast_variable_defitinion;
+          struct AST_VARIABLE_DEFINITION { char* type; char* name; ast_T* value; } ast_variable_definition;
           struct AST_VARIABLE { char* name; } ast_variable;
           //struct AST_CONDITIONAL { struct AST_BOOLEAN };
           //struct AST_BOOLEAN_EXPRESSION {};
           //struct AST_BOOLEAN_FACTOR {};
           //struct AST_COMPARISON {};
           //struct AST_COMPARISON_OPERATOR {};
-          //struct AST_BOOLEAN_LITERAL {};
           //struct AST_EXPRESSION {};
           //struct AST_TERM {};
           //struct AST_FACTOR {};
@@ -60,11 +60,13 @@ struct AST_NODE {
           //struct AST_TYPE {
           //     union data_type { char* string; char character; int integer; double doub; bool boolean; };
           //} ast_variable_type;
-          //char* string_literal;
-          //char character_lieral;
-          //int integer_literal;
-          //double doub_literal;
-          //bool boolean_literal;
+          struct AST_HELPER_DEFINITION { char* name; ast_T** body; } ast_helper_definition;
+
+          char* string_literal;
+          char character_literal;
+          int integer_literal;
+          double doub_literal;
+          bool boolean_literal;
           //struct AST_LIST_OF_NODES {};
           //struct AST_NOOP {};
      } data;

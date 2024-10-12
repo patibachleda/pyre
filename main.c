@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "include/lexer.h"
 #include "include/parser.h"
+#include "include/token.h"
 
 
 char* get_file_contents(const char* filepath)
@@ -32,10 +33,16 @@ char* get_file_contents(const char* filepath)
      exit(2);
 }
 
+//printlist(ast_T** list) {
+//     printf("%d\n", list[0]->type);
+//     printf("%s\n", list[0]->data.ast_main.body[0]->data.ast_variable_definition.value);
+//     printf("%s\n", list[0]->data.ast_main.body[1]->data.ast_variable_definition.value);
+//}
+
 int main(int argc, char* argv[]) {
      if (argc >= 2) {
           for (int i = 1; i < argc; i++) {
-               int len = strlen(argv[i]);
+               int len = (int) strlen(argv[i]);
                char* last_four = &argv[i][len - 5];
                if (strcmp(last_four, ".pyre") == 0) {
                     lexer_T* lexer = init_lexer(
@@ -51,12 +58,19 @@ int main(int argc, char* argv[]) {
                     parser_T* parser = init_parser(lexer);
                     ast_T** list = parser_parse_statements(parser);
 
-                    for (int i = 0; i < 10; i++) {
-                         printf("ast %s %s", list[i]->type, list[i]->data);
-                    }
+                    //printlist(list);
+                 
+ /*                   free(parser);
+                    free(list);*/
 
-                    free(parser);
-                    free(list);
+                    int num = 1;
+                    ast_T* curr = list[0];
+
+                    while (list != NULL) {
+                         free(curr);
+                         curr = list[num];
+                         num += 1;
+                    }
 
                }
                else {

@@ -1,6 +1,34 @@
+process hi(){
+     func(){
+          int a = 3;
+          int b = 4;
+          int c = 2;
+     }
+
+     helper helper1(){
+          int a = 3;
+          int b = 4;
+          int c = 2;
+     }
+}
+process hi(){
+     func(){
+          int a = 3;
+          int b = 4;
+          int c = 2;
+     }
+
+     helper helper1(){
+          int a = 3;
+          int b = 4;
+          int c = 2;
+     }
+}
+
 main(){
      int a = 3;
      int b = 4;
+     int c = 2;
      // if (a == 3.2){
      //     print(a);
      // }

@@ -19,7 +19,7 @@ ast_T* parser_parse(parser_T* parser);
 
 ast_T* parser_parse_statement(parser_T* parser);
 
-ast_T* parser_parse_statements(parser_T* parser);
+ast_T** parser_parse_statements(parser_T* parser);
 
 ast_T* parser_parse_expr(parser_T* parser);
 
