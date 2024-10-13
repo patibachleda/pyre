@@ -45,9 +45,8 @@ int main(int argc, char* argv[]) {
                int len = (int) strlen(argv[i]);
                char* last_four = &argv[i][len - 5];
                if (strcmp(last_four, ".pyre") == 0) {
-                    lexer_T* lexer = init_lexer(
-                         get_file_contents(argv[i])
-                    );
+                    char* file = get_file_contents(argv[i]);
+                    lexer_T* lexer = init_lexer(file);
 
                     //token_T* token = (void*)0;
 
@@ -58,19 +57,25 @@ int main(int argc, char* argv[]) {
                     parser_T* parser = init_parser(lexer);
                     ast_T** list = parser_parse_statements(parser);
 
-                    //printlist(list);
-                 
- /*                   free(parser);
-                    free(list);*/
+                    int list_size = sizeof(list) / sizeof(list[0]);
 
-                    int num = 1;
-                    ast_T* curr = list[0];
-
-                    while (list != NULL) {
-                         free(curr);
-                         curr = list[num];
-                         num += 1;
+                    for (int i = 0; i < list_size; i++) {
+                         free(list[i]);
                     }
+
+                    free(file);
+                    free(lexer);
+                    free(parser);
+                    free(list);
+
+                    //int num = 1;
+                    //ast_T* curr = list[0];
+
+                    //while (list != NULL) {
+                    //     free(curr);
+                    //     curr = list[num];
+                    //     num += 1;
+                    //}
 
                }
                else {

@@ -36,9 +36,9 @@ struct AST_NODE {
           AST_NOOP
      } type;
 
-     union type {
+     union Token {
           struct AST_MAIN { ast_T** body; } ast_main;
-          struct AST_PROCESS_DEFINITION { char* name; ast_T** body; } ast_process_definition;
+          struct AST_PROCESS_DEFINITION { char* name; ast_T* func;  ast_T** helpers; } ast_process_definition;
           struct AST_FUNC_DEFINITION { ast_T** body; } ast_func_definition;
           //struct AST_PROCESS_CALL {};
           //struct AST_HELPER_DEFINITION {};
@@ -47,6 +47,7 @@ struct AST_NODE {
           //struct AST_EMIT {};
           struct AST_VARIABLE_DEFINITION { char* type; char* name; ast_T* value; } ast_variable_definition;
           struct AST_VARIABLE { char* name; } ast_variable;
+          struct AST_BINARY { char* operator; ast_T* left; ast_T* right; } ast_binary;
           //struct AST_CONDITIONAL { struct AST_BOOLEAN };
           //struct AST_BOOLEAN_EXPRESSION {};
           //struct AST_BOOLEAN_FACTOR {};
@@ -69,8 +70,9 @@ struct AST_NODE {
           bool boolean_literal;
           //struct AST_LIST_OF_NODES {};
           //struct AST_NOOP {};
-     } data;
+     } token;
 
+     int numNodes;
      struct SCOPE_STRUCT* scope;
 };
 

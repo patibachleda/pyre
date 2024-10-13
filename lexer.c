@@ -11,14 +11,14 @@ lexer_T* init_lexer(char* contents) {
 
      lexer->contents = contents;
      lexer->index = 0;
-     lexer->current_char = &contents[lexer->index];
+     lexer->current_char = contents[lexer->index];
 
      return lexer;
 }
 
 // helper methods 
 bool is_character_not_null(lexer_T* lexer) {
-     return *lexer->current_char != '\0' && lexer->index < strlen(lexer->contents);
+     return lexer->current_char != '\0' && lexer->index < strlen(lexer->contents);
 }
 
 bool is_next_character_not_null(char character, int index, int contents_len) {
@@ -27,11 +27,11 @@ bool is_next_character_not_null(char character, int index, int contents_len) {
 
 int get_line_num(lexer_T* lexer) {
      int lineNumber = 1;
-     char* target = lexer->current_char;
+     char target = lexer->current_char;
      char* ptr = lexer->contents;  // Pointer to traverse the buffer
 
      while (*ptr != '\0') {  // Loop until the end of the string
-          if (ptr == target) {
+          if (*ptr == target) {
                return lineNumber;  // Return the line number when the pointer matches the target
           }
           if (*ptr == '\n') {
@@ -62,7 +62,7 @@ bool is_match_forward(lexer_T* lexer, char expected) {
 void lexer_move_forward(lexer_T* lexer) {
      if (is_character_not_null(lexer)) {
           lexer->index += 1;
-          lexer->current_char = &lexer->contents[lexer->index];
+          lexer->current_char = lexer->contents[lexer->index];
      }
 }
 
@@ -72,7 +72,7 @@ token_T* lexer_read_forward_with_token(lexer_T* lexer, token_T* token) {
 }
 
 void lexer_skip_whitespace(lexer_T* lexer) {
-     while (isspace(*lexer->current_char)) {
+     while (isspace(lexer->current_char)) {
           lexer_move_forward(lexer);
      }
 }
@@ -81,18 +81,18 @@ token_T* lexer_get_next_token(lexer_T* lexer) {
      while (is_character_not_null(lexer)) {
           lexer_skip_whitespace(lexer);
 
-          if (isalpha(*lexer->current_char)) { //start of a identifier
+          if (isalpha(lexer->current_char)) { //start of a identifier
                return lexer_parse_identifier(lexer);
           }
 
-          if (isdigit(*lexer->current_char)) { //start of a identifier
+          if (isdigit(lexer->current_char)) { //start of a identifier
                return lexer_parse_number(lexer);
           }
 
           char* current_char_as_string = lexer_get_current_char_as_string(lexer);
           int line = get_line_num(lexer);
 
-          switch (*lexer->current_char) {
+          switch (lexer->current_char) {
                case ',':
                     return lexer_read_forward_with_token(lexer, init_token(TOKEN_COMMA, current_char_as_string, line));
                     break;
@@ -149,7 +149,7 @@ token_T* lexer_get_next_token(lexer_T* lexer) {
                }
                case '/': {
                     if (is_match_forward(lexer, '/')) {
-                         while (*lexer->current_char != '\n' && is_next_character_not_null(lexer->contents[lexer->index + 1], lexer->index + 1, strlen(lexer->contents))) {
+                         while (lexer->current_char != '\n' && is_next_character_not_null(lexer->contents[lexer->index + 1], lexer->index + 1, strlen(lexer->contents))) {
                               lexer_move_forward(lexer);
                          }
                     }
@@ -162,7 +162,7 @@ token_T* lexer_get_next_token(lexer_T* lexer) {
                case '"':
                     return lexer_parse_string(lexer); break;
 
-               default: printf("Unexpected character %c on line %d", *lexer->current_char, line); exit(3); break;
+               default: printf("Unexpected character %c on line %d", lexer->current_char, line); exit(3); break;
           }
      }
 
@@ -174,10 +174,12 @@ token_T* lexer_parse_string(lexer_T* lexer) {
      char* string = calloc(1, sizeof(char));
      string[0] = '\0';
 
-     while (*lexer->current_char != '"') { // read everything inside of string
+     while (lexer->current_char != '"') { // read everything inside of string
           char* s = lexer_get_current_char_as_string(lexer);
           string = realloc(string, (strlen(string) + strlen(s) + 1) * sizeof(char));
           strcat(string, s);
+          free(s);
+
 
           lexer_move_forward(lexer);
      }
@@ -191,25 +193,29 @@ token_T* lexer_parse_number(lexer_T* lexer) {
      char* string = calloc(1, sizeof(char));
      string[0] = '\0';
 
-     while (isdigit(*lexer->current_char)) { // read everything inside of string
+     while (isdigit(lexer->current_char)) { // read everything inside of string
           char* s = lexer_get_current_char_as_string(lexer);
           string = realloc(string, (strlen(string) + strlen(s) + 1) * sizeof(char));
           strcat(string, s);
+          free(s);
 
           lexer_move_forward(lexer);
      }
 
      // for doubles
-     if (*lexer->current_char == '.') {
+     if (lexer->current_char == '.') {
           char* s = lexer_get_current_char_as_string(lexer);
           string = realloc(string, (strlen(string) + strlen(s) + 1) * sizeof(char));
           strcat(string, s);
+          free(s);
+
 
           lexer_move_forward(lexer);
-          while (isdigit(*lexer->current_char)) { // read everything inside of string
+          while (isdigit(lexer->current_char)) { // read everything inside of string
                char* s = lexer_get_current_char_as_string(lexer);
                string = realloc(string, (strlen(string) + strlen(s) + 1) * sizeof(char));
                strcat(string, s);
+               free(s);
 
                lexer_move_forward(lexer);
           }
@@ -225,11 +231,11 @@ token_T* lexer_parse_identifier(lexer_T* lexer) {
      identifier[0] = '\0';
      int line_num = get_line_num(lexer);
 
-     while (isalnum(*lexer->current_char)) { // read everything inside of string
+     while (isalnum(lexer->current_char)) { // read everything inside of string
           char* s = lexer_get_current_char_as_string(lexer);
           identifier = realloc(identifier, (strlen(identifier) + strlen(s) + 1) * sizeof(char));
           strcat(identifier, s);
-
+          free(s);
           lexer_move_forward(lexer);
      }
 
@@ -245,8 +251,11 @@ token_T* lexer_parse_identifier(lexer_T* lexer) {
 
 char* lexer_get_current_char_as_string(lexer_T* lexer) {
      char* current_char_as_string = calloc(2, sizeof(char));
-     current_char_as_string[0] = *lexer->current_char;
-     current_char_as_string[1] = '\0';
+
+     if (current_char_as_string) {
+          current_char_as_string[0] = lexer->current_char;
+          current_char_as_string[1] = '\0';
+     }
 
      return current_char_as_string;
 }

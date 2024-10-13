@@ -19,14 +19,14 @@ static const struct {
 	{"for",      TOKEN_FOR},
 	{"emit",    TOKEN_EMIT},
 	{"int",	  TOKEN_INT_TYPE},
-		{"double",	  TOKEN_DOUBLE_TYPE},
-			{"string",	  TOKEN_STRING_TYPE},
-				{"char",	  TOKEN_CHAR_TYPE},
-					{"boolean",	  TOKEN_BOOLEAN_TYPE}
+	{"double",	  TOKEN_DOUBLE_TYPE},
+	{"string",	  TOKEN_STRING_TYPE},
+	{"char",	  TOKEN_CHAR_TYPE},
+	{"boolean",	  TOKEN_BOOLEAN_TYPE}
 };
 
 typedef struct LEXER_STRUCT {
-     char* current_char;
+     char current_char;
      unsigned int index;
      char* contents;
 } lexer_T;
