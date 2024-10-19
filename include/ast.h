@@ -55,7 +55,7 @@ struct AST_NODE {
           //struct AST_COMPARISON_OPERATOR {};
           //struct AST_EXPRESSION {};
           //struct AST_TERM {};
-          //struct AST_FACTOR {};
+          //struct AST_FACTOR {};:
           //struct AST_ARG_LIST {};
           //struct AST_NAMED_ARG {};
           //struct AST_TYPE {
@@ -65,7 +65,7 @@ struct AST_NODE {
 
           char* string_literal;
           char character_literal;
-          int integer_literal;
+          int ast_int;
           double doub_literal;
           bool boolean_literal;
           //struct AST_LIST_OF_NODES {};
@@ -73,7 +73,6 @@ struct AST_NODE {
      } token;
 
      int numNodes;
-     struct SCOPE_STRUCT* scope;
 };
 
 

@@ -180,7 +180,6 @@ token_T* lexer_parse_string(lexer_T* lexer) {
           strcat(string, s);
           free(s);
 
-
           lexer_move_forward(lexer);
      }
 
