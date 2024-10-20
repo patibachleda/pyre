@@ -47,6 +47,7 @@ char lexer_look_forward(lexer_T* lexer) {
      if (is_next_character_not_null(lexer->contents[lexer->index + 1], lexer->index + 1, strlen(lexer->contents))) {
           return lexer->contents[(lexer->index+1)];
      }
+     return '\0';
 }
 
 bool is_match_forward(lexer_T* lexer, char expected) {
@@ -125,26 +126,26 @@ token_T* lexer_get_next_token(lexer_T* lexer) {
                     break;
                case '=': {
                     int type = is_match_forward(lexer, '=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUALS;
-                    char* value = type == TOKEN_EQUAL_EQUAL ? "==" : current_char_as_string;
-                    return lexer_read_forward_with_token(lexer, init_token(type, value, line));
+                    current_char_as_string = type == TOKEN_EQUAL_EQUAL ? "==" : current_char_as_string;
+                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line));
                     break;
                     }
                case '!': {
                     int type = is_match_forward(lexer, '=') ? TOKEN_BANG_EQUAL : TOKEN_BANG;
-                    char* value = type == TOKEN_BANG_EQUAL ? "!=" : current_char_as_string;
-                    return lexer_read_forward_with_token(lexer, init_token(type, value, line));
+                    current_char_as_string = type == TOKEN_BANG_EQUAL ? "!=" : current_char_as_string;
+                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line));
                     break;
                }
                case '<': {
                     int type = is_match_forward(lexer, '=') ? TOKEN_LESS_EQUAL : TOKEN_LESS;
-                    char* value = type == TOKEN_LESS_EQUAL ? "<=" : current_char_as_string;
-                    return lexer_read_forward_with_token(lexer, init_token(type, value, line));
+                    current_char_as_string = type == TOKEN_LESS_EQUAL ? "<=" : current_char_as_string;
+                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line));
                     break;
                }
                case '>': {
                     int type = is_match_forward(lexer, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER;
-                    char* value = type == TOKEN_GREATER_EQUAL ? ">=" : current_char_as_string;
-                    return lexer_read_forward_with_token(lexer, init_token(type, value, line));
+                    current_char_as_string = type == TOKEN_GREATER_EQUAL ? ">=" : current_char_as_string;
+                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line));
                     break;
                }
                case '/': {

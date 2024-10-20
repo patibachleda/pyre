@@ -1,21 +1,13 @@
-process hi1(){
-     func(){
-          int a = 3;
-     }
-
-     helper hi2(){
-          int b = 4;
-     }
-}
 process hi3(){
      func(){
-          int c = 5;
+          int c = 3;
      }
 
      helper hi4(){
-          int d = 6;
+          int d = 4;
      }
 }
+
 
 main(){
      int e = 7;

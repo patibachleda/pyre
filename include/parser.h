@@ -3,7 +3,6 @@
 #include "lexer.h"
 #include "AST.h"
 
-
 typedef struct PARSER_STRUCT
 {
      lexer_T* lexer;
@@ -19,7 +18,7 @@ ast_T* parser_parse(parser_T* parser);
 
 ast_T* parser_parse_statement(parser_T* parser);
 
-ast_T** parser_parse_statements(parser_T* parser);
+ast_T** parser_parse_statements(parser_T* parser, int* ll_size);
 
 ast_T* parser_parse_expr(parser_T* parser);
 
@@ -30,6 +29,8 @@ ast_T* parser_parse_term(parser_T* parser);
 ast_T* parser_parse_function_call(parser_T* parser);
 
 ast_T* parser_parse_int_variable_definition(parser_T* parser);
+
+ast_T* parser_parse_int(parser_T* parser);
 
 ast_T* parser_parse_func_definition(parser_T* parser);
 

@@ -39,76 +39,48 @@ void traverse_list(ast_T** nodeList, int numNodes) {
           // Process the node based on its type
           switch (node->type) {
           case AST_MAIN:
-               printf("Processing AST_MAIN\n");
+               // printf("Processing AST_MAIN\n");
                traverse_list(node->token.ast_main.body, node->numNodes); // Recursively process the body
+               printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
                free(node->token.ast_main.body);
                free(node);
                break;
           case AST_PROCESS_DEFINITION:
-               printf("Processing AST_PROCESS_DEFINITION\n");
-               printf("Processing AST_FUNC_DEFINITION\n");
+               // printf("Processing AST_PROCESS_DEFINITION\n");
+               // printf("Processing AST_FUNC_DEFINITION\n");
                traverse_list(node->token.ast_process_definition.func->token.ast_func_definition.body, node->token.ast_process_definition.func->numNodes);
                traverse_list(node->token.ast_process_definition.helpers, node->numNodes);
+               
+               free(node->token.ast_process_definition.func->token.ast_func_definition.body);
                free(node->token.ast_process_definition.func);
                free(node->token.ast_process_definition.helpers);
+               free(node->token.ast_process_definition.name);
+
                free(node);
                break;
           case AST_HELPER_DEFINITION:
-               printf("Processing AST_HELPER_DEFINITION: %s\n", node->token.ast_helper_definition.name);
+               // printf("Processing AST_HELPER_DEFINITION: %s\n", node->token.ast_helper_definition.name);
                traverse_list(node->token.ast_helper_definition.body, node->numNodes);
+               free(node->token.ast_helper_definition.name);
                free(node->token.ast_helper_definition.body);
                free(node);
                break;
           case AST_VARIABLE_DEFINITION:
-               printf("Processing AST_VARIABLE_DEFINITION: %s\n", node->token.ast_variable_definition.name);
+               // printf("Processing AST_VARIABLE_DEFINITION: %s\n", node->token.ast_variable_definition.name);
+               printf("freeing token type %s: %p\n", node->token.ast_variable_definition.type, node->token.ast_variable_definition.type);
+               free(node->token.ast_variable_definition.type);
+               printf("freeing token type %s: %p\n", node->token.ast_variable_definition.name, node->token.ast_variable_definition.name);
+               free(node->token.ast_variable_definition.name);
+               printf("freeing token type %d: %p\n", node->token.ast_variable_definition.value->type, node->token.ast_variable_definition.value);
+               free(node->token.ast_variable_definition.value);
                free(node);
                break;
           default:
-               printf("Unknown node type\n");
-               free(node);
+               // printf("Unknown node type\n");
                break;
           }
      }
 }
-
-void free_parser(parser_T* parser) {
-     if (!parser) return;
-
-     // Free any remaining tokens, if necessary
-     if (parser->current_token) {
-          free(parser->current_token->value);
-          free(parser->current_token);
-     }
-
-     // Free any AST nodes (if stored)
-     // Assuming parser_parse_statements or similar stores the root of the AST somewhere
-     if (parser->prev_token) {  // Replace with your root AST field if necessary
-          free(parser->prev_token->value);
-          free(parser->prev_token);
-     }
-
-     if (parser->lexer) {  // Replace with your root AST field if necessary
-          free(parser->lexer);
-     }
-
-
-     // Finally, free the parser structure itself
-     free(parser);
-}
-
-void free_lexer(lexer_T* lexer) {
-     if (!lexer) return;
-
-     // Free the contents string (dynamically allocated source code)
-     if (lexer->contents) {
-          free(lexer->contents);
-     }
-
-     // Free the lexer structure itself
-     free(lexer);
-}
-
-
 
 int main(int argc, char* argv[]) {
      if (argc >= 2) {
@@ -127,6 +99,7 @@ int main(int argc, char* argv[]) {
                 
                     free(file);
                     free(lexer);
+                    free(parser);
                     free(list);
 
                     printf("complete");
