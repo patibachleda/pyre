@@ -13,7 +13,6 @@ parser_T* init_parser(lexer_T* lexer) {
      return parser;
 }
 
-
 void parser_move_forward(parser_T* parser, int token_type) {
      if (parser->current_token->type == token_type) {
           parser->prev_token = parser->current_token;
@@ -28,11 +27,10 @@ void parser_move_forward(parser_T* parser, int token_type) {
                parser->current_token->type == TOKEN_RCURLY ||
                parser->current_token->type == TOKEN_LCURLY ||
                parser->current_token->type == TOKEN_RPAREN ||
-               parser->current_token->type == TOKEN_LPAREN ||
-               parser->current_token->type == TOKEN_EQUALS )
+               parser->current_token->type == TOKEN_LPAREN)
           {
-               printf("freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
-               printf("freeing value %s: %p\n", parser->prev_token->value, parser->prev_token->value);
+               //printf("freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
+               //printf("freeing value %s: %p\n", parser->prev_token->value, parser->prev_token->value);
                free(parser->prev_token->value);
                free(parser->prev_token);
                parser->prev_token = NULL;
@@ -59,7 +57,7 @@ ast_T** parser_parse_statements(parser_T* parser, int* ll_size) {
 
      // if main is not the last in ll_nodes then this will break because process already handles the last curly
      // you should think of a way to exit while loop diff than last curly
-     printf("freeing value %s: %p\n", parser->current_token->value, parser->current_token->value);
+     //printf("freeing value %s: %p\n", parser->current_token->value, parser->current_token->value);
      free(parser->current_token->value);
      free(parser->current_token);
 
@@ -71,7 +69,7 @@ ast_T* parser_parse_statement(parser_T* parser){
      {
           case TOKEN_MAIN: return parser_parse_main(parser);
           // Literals
-          //case TOKEN_ID: return parser_parse_id(parser); break;
+          case TOKEN_ID: return parser_parse_id(parser); break;
           case TOKEN_INT_TYPE: return parser_parse_int_variable_definition(parser);
           case TOKEN_PROCESS: return parser_parse_process_definition(parser);
           case TOKEN_FUNC: return parser_parse_func_definition(parser);
@@ -88,6 +86,32 @@ ast_T* parser_parse_statement(parser_T* parser){
      return init_ast(AST_NOOP);
 }
 
+ast_T* parser_parse_id(parser_T* parser) {
+     ast_T* node = NULL;
+     char* name = parser->current_token->value; // get the user declared name
+     free(parser->prev_token);
+     parser_move_forward(parser, TOKEN_ID);
+
+     // process call
+     if (parser->current_token->type == TOKEN_LPAREN) {
+          node = init_ast(AST_PROCESS_CALL);
+          node->token.ast_process_call.name = name;
+          parser_parse_arguments_definition(parser);
+
+          if (parser->current_token->type == TOKEN_ARROW) {
+               parser_move_forward(parser, TOKEN_ARROW);
+
+          }
+          else {
+               parser_move_forward(parser, TOKEN_SEMICOLON);
+          }
+     }
+
+     // variable
+
+     return node;
+}
+
 ast_T* parser_parse_int(parser_T* parser) {
      ast_T* node = init_ast(AST_INT);
      node->token.ast_int = atoi(parser->current_token->value);
@@ -96,21 +120,20 @@ ast_T* parser_parse_int(parser_T* parser) {
      return node;
 }
 
-
 ast_T* parser_parse_int_variable_definition(parser_T* parser){
      ast_T* node = init_ast(AST_VARIABLE_DEFINITION);
      node->token.ast_variable_definition.type = parser->current_token->value;
      parser_move_forward(parser, TOKEN_INT_TYPE);
-     printf("freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
+     //printf("freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
      free(parser->prev_token);
      node->token.ast_variable_definition.name = parser->current_token->value;
      parser_move_forward(parser, TOKEN_ID);
-     printf("freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
+     //printf("freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
      free(parser->prev_token);
      parser_move_forward(parser, TOKEN_EQUALS);
      node->token.ast_variable_definition.value = parser_parse_statement(parser);
      parser_move_forward(parser, TOKEN_INT);
-     printf("freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
+     //printf("freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
      free(parser->prev_token);
      parser_move_forward(parser, TOKEN_SEMICOLON);
      node->numNodes = 0;
@@ -122,6 +145,7 @@ ast_T* parser_parse_main(parser_T* parser) {
      ast_T* main_node = init_ast(AST_MAIN);
      parser_move_forward(parser, TOKEN_MAIN);
      parser_parse_arguments_definition(parser);
+     parser_move_forward(parser, TOKEN_LCURLY);
 
      int num = 0;
 
@@ -143,10 +167,11 @@ ast_T* parser_parse_process_definition(parser_T* parser) {
 
      process_node->token.ast_process_definition.name = parser->current_token->value;
      parser_move_forward(parser, TOKEN_ID);
-     printf("freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
+     //printf("freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
      free(parser->prev_token);
 
      parser_parse_arguments_definition(parser);
+     parser_move_forward(parser, TOKEN_LCURLY);
      // maybe i want this more generic, think about once you get everything how you can optimize
      // the code. generic = use parser_parse_statement
  
@@ -172,6 +197,7 @@ ast_T* parser_parse_func_definition(parser_T* parser) {
      ast_T* func_node = init_ast(AST_FUNC_DEFINITION);
      parser_move_forward(parser, TOKEN_FUNC);
      parser_parse_arguments_definition(parser);
+     parser_move_forward(parser, TOKEN_LCURLY);
 
      int num = 0;
 
@@ -193,9 +219,10 @@ ast_T* parser_parse_helper_definition(parser_T* parser) {
      parser_move_forward(parser, TOKEN_HELPER);
      helper_node->token.ast_helper_definition.name = parser->current_token->value;
      parser_move_forward(parser, TOKEN_ID);
-     printf("freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
+     //printf("freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
      free(parser->prev_token);
      parser_parse_arguments_definition(parser);
+     parser_move_forward(parser, TOKEN_LCURLY);
 
      int num = 0;
 
@@ -215,5 +242,4 @@ ast_T* parser_parse_helper_definition(parser_T* parser) {
 void parser_parse_arguments_definition(parser_T* parser) {
      parser_move_forward(parser, TOKEN_LPAREN);
      parser_move_forward(parser, TOKEN_RPAREN);
-     parser_move_forward(parser, TOKEN_LCURLY);
 }

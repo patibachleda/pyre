@@ -39,15 +39,15 @@ void traverse_list(ast_T** nodeList, int numNodes) {
           // Process the node based on its type
           switch (node->type) {
           case AST_MAIN:
-               // printf("Processing AST_MAIN\n");
+                printf("Processing AST_MAIN\n");
                traverse_list(node->token.ast_main.body, node->numNodes); // Recursively process the body
-               printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
+               //printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
                free(node->token.ast_main.body);
                free(node);
                break;
           case AST_PROCESS_DEFINITION:
-               // printf("Processing AST_PROCESS_DEFINITION\n");
-               // printf("Processing AST_FUNC_DEFINITION\n");
+               printf("Processing AST_PROCESS_DEFINITION\n");
+               printf("Processing AST_FUNC_DEFINITION\n");
                traverse_list(node->token.ast_process_definition.func->token.ast_func_definition.body, node->token.ast_process_definition.func->numNodes);
                traverse_list(node->token.ast_process_definition.helpers, node->numNodes);
                
@@ -58,20 +58,25 @@ void traverse_list(ast_T** nodeList, int numNodes) {
 
                free(node);
                break;
+          case AST_PROCESS_CALL:
+               printf("Processing AST_PROCESS_CALL\n");
+               free(node->token.ast_process_call.name);
+               free(node);
+               break;
           case AST_HELPER_DEFINITION:
-               // printf("Processing AST_HELPER_DEFINITION: %s\n", node->token.ast_helper_definition.name);
+                printf("Processing AST_HELPER_DEFINITION: %s\n", node->token.ast_helper_definition.name);
                traverse_list(node->token.ast_helper_definition.body, node->numNodes);
                free(node->token.ast_helper_definition.name);
                free(node->token.ast_helper_definition.body);
                free(node);
                break;
           case AST_VARIABLE_DEFINITION:
-               // printf("Processing AST_VARIABLE_DEFINITION: %s\n", node->token.ast_variable_definition.name);
-               printf("freeing token type %s: %p\n", node->token.ast_variable_definition.type, node->token.ast_variable_definition.type);
+                printf("Processing AST_VARIABLE_DEFINITION: %s\n", node->token.ast_variable_definition.name);
+               //printf("freeing token type %s: %p\n", node->token.ast_variable_definition.type, node->token.ast_variable_definition.type);
                free(node->token.ast_variable_definition.type);
-               printf("freeing token type %s: %p\n", node->token.ast_variable_definition.name, node->token.ast_variable_definition.name);
+               //printf("freeing token type %s: %p\n", node->token.ast_variable_definition.name, node->token.ast_variable_definition.name);
                free(node->token.ast_variable_definition.name);
-               printf("freeing token type %d: %p\n", node->token.ast_variable_definition.value->type, node->token.ast_variable_definition.value);
+               //printf("freeing token type %d: %p\n", node->token.ast_variable_definition.value->type, node->token.ast_variable_definition.value);
                free(node->token.ast_variable_definition.value);
                free(node);
                break;
@@ -90,6 +95,11 @@ int main(int argc, char* argv[]) {
                if (strcmp(last_four, ".pyre") == 0) {
                     char* file = get_file_contents(argv[i]);
                     lexer_T* lexer = init_lexer(file);
+
+                    //token_T* token = (void*)0;
+                    //while ((token = lexer_get_next_token(lexer)) != (void*)0) {
+                    //     printf("token %d %s %d \n", token->type, token->value, token->line);
+                    //}
 
                     parser_T* parser = init_parser(lexer);
                     int list_size = 0;

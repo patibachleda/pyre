@@ -18,43 +18,44 @@ typedef struct TOKEN_STRUCT {
           TOKEN_WHILE, // 10
           TOKEN_FOR, // 11
           TOKEN_EMIT, // 12
+          TOKEN_ARROW, //13
 
           // Arithmetic
-          TOKEN_EQUALS, // 13
-          TOKEN_GREATER, // 14
-          TOKEN_LESS, // 15
-          TOKEN_GREATER_EQUAL, // 16
-          TOKEN_LESS_EQUAL, // 17
-          TOKEN_EQUAL_EQUAL, // 18
-          TOKEN_BANG, // 19
-          TOKEN_BANG_EQUAL, // 20
-          TOKEN_PLUS, // 21
-          TOKEN_MINUS, // 22
-          TOKEN_STAR, // 23
-          TOKEN_DIVIDE, // 24
+          TOKEN_EQUALS, // 14
+          TOKEN_GREATER, // 15
+          TOKEN_LESS, // 16
+          TOKEN_GREATER_EQUAL, // 17
+          TOKEN_LESS_EQUAL, // 18
+          TOKEN_EQUAL_EQUAL, // 19
+          TOKEN_BANG, // 20
+          TOKEN_BANG_EQUAL, // 21
+          TOKEN_PLUS, // 22
+          TOKEN_MINUS, // 23
+          TOKEN_STAR, // 24
+          TOKEN_DIVIDE, // 25
 
           // Types
-          TOKEN_STRING, // 25
-          TOKEN_INT, // 26
-          TOKEN_DOUBLE, // 27
-          TOKEN_BOOLEAN, // 28
-          TOKEN_CHARACTER, // 29
+          TOKEN_STRING, // 26
+          TOKEN_INT, // 27
+          TOKEN_DOUBLE, // 28
+          TOKEN_BOOLEAN, // 29
+          TOKEN_CHARACTER, // 30
 
           // Syntax
-          TOKEN_SEMICOLON, // 30
-          TOKEN_COMMA, // 31
-          TOKEN_DOT, // 32
-          TOKEN_LPAREN, // 33
-          TOKEN_RPAREN, // 34
-          TOKEN_LCURLY, // 35
-          TOKEN_RCURLY, // 36
+          TOKEN_SEMICOLON, // 31
+          TOKEN_COMMA, // 32
+          TOKEN_DOT, // 33
+          TOKEN_LPAREN, // 34
+          TOKEN_RPAREN, // 35
+          TOKEN_LCURLY, // 36
+          TOKEN_RCURLY, // 37
 
           // Types
-          TOKEN_INT_TYPE, // 37
-          TOKEN_DOUBLE_TYPE, // 38
-          TOKEN_STRING_TYPE, // 39
-          TOKEN_CHAR_TYPE, // 40
-          TOKEN_BOOLEAN_TYPE //41
+          TOKEN_INT_TYPE, // 38
+          TOKEN_DOUBLE_TYPE, // 39
+          TOKEN_STRING_TYPE, // 40
+          TOKEN_CHAR_TYPE, // 41
+          TOKEN_BOOLEAN_TYPE //42
      } type;
 
      char* value;

@@ -10,5 +10,5 @@ process hi3(){
 
 
 main(){
-     int e = 7;
+     hi3() -> hi4();
 }

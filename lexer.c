@@ -60,21 +60,21 @@ bool is_match_forward(lexer_T* lexer, char expected) {
 }
 
 // core methods
-void lexer_move_forward(lexer_T* lexer) {
+void lexer_move_forward(lexer_T* lexer, int spaces) {
      if (is_character_not_null(lexer)) {
-          lexer->index += 1;
+          lexer->index += spaces;
           lexer->current_char = lexer->contents[lexer->index];
      }
 }
 
-token_T* lexer_read_forward_with_token(lexer_T* lexer, token_T* token) {
-     lexer_move_forward(lexer);
+token_T* lexer_read_forward_with_token(lexer_T* lexer, token_T* token, int spaces) {
+     lexer_move_forward(lexer, spaces);
      return token;
 }
 
 void lexer_skip_whitespace(lexer_T* lexer) {
      while (isspace(lexer->current_char)) {
-          lexer_move_forward(lexer);
+          lexer_move_forward(lexer, 1);
      }
 }
 
@@ -95,67 +95,75 @@ token_T* lexer_get_next_token(lexer_T* lexer) {
 
           switch (lexer->current_char) {
                case ',':
-                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_COMMA, current_char_as_string, line));
+                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_COMMA, current_char_as_string, line), 1);
                     break;
                case '.':
-                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_DOT, current_char_as_string, line));
-                    break;
-               case '-':
-                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_MINUS, current_char_as_string, line));
+                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_DOT, current_char_as_string, line), 1);
                     break;
                case '+':
-                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_PLUS, current_char_as_string, line));
+                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_PLUS, current_char_as_string, line), 1);
                     break;
                case '*':
-                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_STAR, current_char_as_string, line));
+                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_STAR, current_char_as_string, line), 1);
                     break;
                case ';':
-                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_SEMICOLON, current_char_as_string, line));
+                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_SEMICOLON, current_char_as_string, line), 1);
                     break;
                case '(':
-                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_LPAREN, current_char_as_string, line));
+                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_LPAREN, current_char_as_string, line), 1);
                     break;
                case ')':
-                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_RPAREN, current_char_as_string, line));
+                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_RPAREN, current_char_as_string, line), 1);
                     break;
                case '{':
-                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_LCURLY, current_char_as_string, line));
+                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_LCURLY, current_char_as_string, line), 1);
                     break;
                case '}':
-                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_RCURLY, current_char_as_string, line));
+                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_RCURLY, current_char_as_string, line), 1);
                     break;
+               case '-': {
+                    int type = is_match_forward(lexer, '>') ? TOKEN_ARROW : TOKEN_MINUS;
+                    current_char_as_string = type == TOKEN_ARROW ? "->" : current_char_as_string;
+                    int spaces = type == TOKEN_ARROW ? 2 : 1;
+                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line), spaces);
+                    break;
+               }
                case '=': {
                     int type = is_match_forward(lexer, '=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUALS;
                     current_char_as_string = type == TOKEN_EQUAL_EQUAL ? "==" : current_char_as_string;
-                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line));
+                    int spaces = type == TOKEN_EQUAL_EQUAL ? 2 : 1;
+                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line), spaces);
                     break;
-                    }
+               }
                case '!': {
                     int type = is_match_forward(lexer, '=') ? TOKEN_BANG_EQUAL : TOKEN_BANG;
                     current_char_as_string = type == TOKEN_BANG_EQUAL ? "!=" : current_char_as_string;
-                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line));
+                    int spaces = type == TOKEN_BANG_EQUAL ? 2 : 1;
+                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line), spaces);
                     break;
                }
                case '<': {
                     int type = is_match_forward(lexer, '=') ? TOKEN_LESS_EQUAL : TOKEN_LESS;
                     current_char_as_string = type == TOKEN_LESS_EQUAL ? "<=" : current_char_as_string;
-                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line));
+                    int spaces = type == TOKEN_LESS_EQUAL ? 2 : 1;
+                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line), spaces);
                     break;
                }
                case '>': {
                     int type = is_match_forward(lexer, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER;
                     current_char_as_string = type == TOKEN_GREATER_EQUAL ? ">=" : current_char_as_string;
-                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line));
+                    int spaces = type == TOKEN_GREATER_EQUAL ? 2 : 1;
+                    return lexer_read_forward_with_token(lexer, init_token(type, current_char_as_string, line), spaces);
                     break;
                }
                case '/': {
                     if (is_match_forward(lexer, '/')) {
                          while (lexer->current_char != '\n' && is_next_character_not_null(lexer->contents[lexer->index + 1], lexer->index + 1, strlen(lexer->contents))) {
-                              lexer_move_forward(lexer);
+                              lexer_move_forward(lexer, 1);
                          }
                     }
                     else {
-                         return lexer_read_forward_with_token(lexer, init_token(TOKEN_DIVIDE, current_char_as_string, line));
+                         return lexer_read_forward_with_token(lexer, init_token(TOKEN_DIVIDE, current_char_as_string, line), 1);
                     }
                     
                     break;
@@ -171,7 +179,7 @@ token_T* lexer_get_next_token(lexer_T* lexer) {
 }
 
 token_T* lexer_parse_string(lexer_T* lexer) {
-     lexer_move_forward(lexer);
+     lexer_move_forward(lexer, 1);
      char* string = calloc(1, sizeof(char));
      string[0] = '\0';
 
@@ -181,10 +189,10 @@ token_T* lexer_parse_string(lexer_T* lexer) {
           strcat(string, s);
           free(s);
 
-          lexer_move_forward(lexer);
+          lexer_move_forward(lexer, 1);
      }
 
-     lexer_move_forward(lexer);
+     lexer_move_forward(lexer, 1);
 
      return init_token(TOKEN_STRING, string, get_line_num(lexer));
 }
@@ -199,7 +207,7 @@ token_T* lexer_parse_number(lexer_T* lexer) {
           strcat(string, s);
           free(s);
 
-          lexer_move_forward(lexer);
+          lexer_move_forward(lexer, 1);
      }
 
      // for doubles
@@ -210,14 +218,14 @@ token_T* lexer_parse_number(lexer_T* lexer) {
           free(s);
 
 
-          lexer_move_forward(lexer);
+          lexer_move_forward(lexer, 1);
           while (isdigit(lexer->current_char)) { // read everything inside of string
                char* s = lexer_get_current_char_as_string(lexer);
                string = realloc(string, (strlen(string) + strlen(s) + 1) * sizeof(char));
                strcat(string, s);
                free(s);
 
-               lexer_move_forward(lexer);
+               lexer_move_forward(lexer, 1);
           }
 
           return init_token(TOKEN_DOUBLE, string, get_line_num(lexer));
@@ -236,7 +244,7 @@ token_T* lexer_parse_identifier(lexer_T* lexer) {
           identifier = realloc(identifier, (strlen(identifier) + strlen(s) + 1) * sizeof(char));
           strcat(identifier, s);
           free(s);
-          lexer_move_forward(lexer);
+          lexer_move_forward(lexer, 1);
      }
 
      // is it a keyword?

@@ -40,36 +40,33 @@ struct AST_NODE {
           struct AST_MAIN { ast_T** body; } ast_main;
           struct AST_PROCESS_DEFINITION { char* name; ast_T* func;  ast_T** helpers; } ast_process_definition;
           struct AST_FUNC_DEFINITION { ast_T** body; } ast_func_definition;
-          //struct AST_PROCESS_CALL {};
-          //struct AST_HELPER_DEFINITION {};
-          //struct AST_HELPER_CALL {};
-          //struct AST_STATEMENT {};
-          //struct AST_EMIT {};
+          struct AST_HELPER_DEFINITION { char* name; ast_T** body; } ast_helper_definition;
           struct AST_VARIABLE_DEFINITION { char* type; char* name; ast_T* value; } ast_variable_definition;
           struct AST_VARIABLE { char* name; } ast_variable;
           struct AST_BINARY { char* operator; ast_T* left; ast_T* right; } ast_binary;
+
+          struct AST_PROCESS_CALL { char* name; ast_T** arguments;  } ast_process_call;
+          //struct AST_HELPER_CALL {};
+          //struct AST_EMIT {};
+
           //struct AST_CONDITIONAL { struct AST_BOOLEAN };
-          //struct AST_BOOLEAN_EXPRESSION {};
-          //struct AST_BOOLEAN_FACTOR {};
           //struct AST_COMPARISON {};
           //struct AST_COMPARISON_OPERATOR {};
+          
+          //struct AST_STATEMENT {};
           //struct AST_EXPRESSION {};
-          //struct AST_TERM {};
-          //struct AST_FACTOR {};:
+
+          //struct AST_BOOLEAN_EXPRESSION {};
+          //struct AST_BOOLEAN_FACTOR {};
+       
           //struct AST_ARG_LIST {};
           //struct AST_NAMED_ARG {};
-          //struct AST_TYPE {
-          //     union data_type { char* string; char character; int integer; double doub; bool boolean; };
-          //} ast_variable_type;
-          struct AST_HELPER_DEFINITION { char* name; ast_T** body; } ast_helper_definition;
 
           char* string_literal;
           char character_literal;
           int ast_int;
           double doub_literal;
           bool boolean_literal;
-          //struct AST_LIST_OF_NODES {};
-          //struct AST_NOOP {};
      } token;
 
      int numNodes;
