@@ -80,6 +80,21 @@ void traverse_list(ast_T** nodeList, int numNodes) {
                free(node->token.ast_variable_definition.value);
                free(node);
                break;
+          case AST_EMIT:
+               printf("Processing AST_EMIT\n");
+               ast_T* stmt[] = { node->token.ast_emit.stmt };
+               traverse_list(stmt, 1); // Recursively process the body
+               ////printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
+               //free(node->token.ast_main.body);
+               free(node);
+               break;
+          case AST_INT:
+               printf("Processing AST_INT: %d\n", node->token.ast_int);
+               //traverse_list(node->token.ast_main.body, node->numNodes); // Recursively process the body
+               ////printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
+               //free(node->token.ast_main.body);
+               free(node);
+               break;
           default:
                // printf("Unknown node type\n");
                break;

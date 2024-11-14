@@ -5,6 +5,7 @@ process hi3(){
 
      helper hi4(){
           int d = 4;
+          emit 4;
      }
 }
 
