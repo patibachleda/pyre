@@ -1,6 +1,9 @@
 process hi3(){
      func(){
-          int c = 3;
+          if( 2 == 2){
+          //     int c = 3;
+          } else{}
+          
      }
 
      helper hi4(){

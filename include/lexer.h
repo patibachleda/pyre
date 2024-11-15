@@ -8,8 +8,8 @@ static const struct {
 } keywords[] = {
 	{"and",     TOKEN_AND},
 	{"or",    TOKEN_OR},
-	{"is",       TOKEN_IS},
-	{"elis",     TOKEN_ELIS},
+	{"if",       TOKEN_IS},
+	{"elif",     TOKEN_ELIS},
 	{"else",     TOKEN_ELSE},
 	{"process",    TOKEN_PROCESS},
 	{"func",      TOKEN_FUNC},

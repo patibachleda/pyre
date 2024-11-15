@@ -1,11 +1,9 @@
 process add(int a, int b){
      int func(){
           paramsInBoundCheck()
-          is (isParamInBound){
+          if (isParamInBound){
                emit data1(a+b);
-          } elis (<some other thing>){
-           // do stuff
-          } else {
+          }else {
            // do something else
           }
           
@@ -15,17 +13,13 @@ process add(int a, int b){
      // you can have if/else statements like this
      // you can also exclude the yes/no and it the inside of the statement will be 'yes'
      helper boolean paramsInBoundCheck(){
-          is (a < 10 and is b < 5){
-               yes {
-                    emit isParamInBound(true);
-               }
-               no {
-                    emit isParamInBound(false);
-               }
+          if (a < 10 and is b < 5){
+               emit isParamInBound(true);
+          } else {
+               emit isParamInBound(false);
           }
      }
 }
-
 
 process multiple(int data1){
      int func(){

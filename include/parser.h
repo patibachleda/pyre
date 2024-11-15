@@ -50,5 +50,22 @@ ast_T* parser_parse_emit(parser_T* parser);
 
 ast_T* parser_parse_main(parser_T* parser);
 
+ast_T* parser_parse_main(parser_T* parser);
+
+ast_T* parser_parse_conditional(parser_T* parser);
+
+ast_T* parser_parse_unary(parser_T* parser);
+
+ast_T* parser_parse_factor(parser_T* parser);
+
+ast_T* parser_parse_term(parser_T* parser);
+
+ast_T* parser_parse_comparison(parser_T* parser);
+
+ast_T* parser_parse_equality(parser_T* parser);
+
+ast_T* parser_parse_conditional(parser_T* parser);
+
 void parser_parse_arguments_definition(parser_T* parser);
+
 #endif
