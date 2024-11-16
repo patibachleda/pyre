@@ -55,7 +55,13 @@ typedef struct TOKEN_STRUCT {
           TOKEN_DOUBLE_TYPE, // 39
           TOKEN_STRING_TYPE, // 40
           TOKEN_CHAR_TYPE, // 41
-          TOKEN_BOOLEAN_TYPE //42
+          TOKEN_BOOLEAN_TYPE, //42
+
+          TOKEN_EXPRESSION_INT,
+          TOKEN_EXPRESSION_DOUBLE,
+          TOKEN_EXPRESSION_STRING,
+          TOKEN_EXPRESSION_CHAR,
+          TOKEN_EXPRESSION_BOOLEAN
      } type;
 
      char* value;

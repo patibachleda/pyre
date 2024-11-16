@@ -1,8 +1,10 @@
 process hi3(){
      func(){
           if( 2 == 2){
-          //     int c = 3;
-          } else{}
+               int c = 3;
+          } else{
+               int d = 2;
+          }
           
      }
 

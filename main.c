@@ -36,20 +36,20 @@ char* get_file_contents(const char* filepath)
 void traverse_list(ast_T** nodeList, int numNodes) {
      if (nodeList == NULL || nodeList[0] == NULL) { return; }
 
-     for (int i = 0; i < sizeof(nodeList) / sizeof(nodeList[0]); i++) {
+     for (int i = 0; i < numNodes; i++) {
           ast_T* node = nodeList[i];
           // Process the node based on its type
           ast_T* stmt[1];
           switch (node->type) {
           case AST_MAIN:
-                printf("Processing AST_MAIN\n");
+               printf("Processing AST_MAIN\n");
                traverse_list(node->token.ast_main.body, node->numNodes); // Recursively process the body
                //printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
                free(node->token.ast_main.body);
                free(node);
                break;
           case AST_PROCESS_DEFINITION:
-               printf("Processing AST_PROCESS_DEFINITION\n");
+               printf("Processing AST_PROCESS_DEFINITION: %s\n", node->token.ast_process_definition.name);
                printf("Processing AST_FUNC_DEFINITION\n");
                traverse_list(node->token.ast_process_definition.func->token.ast_func_definition.body, node->token.ast_process_definition.func->numNodes);
                traverse_list(node->token.ast_process_definition.helpers, node->numNodes);
@@ -62,7 +62,7 @@ void traverse_list(ast_T** nodeList, int numNodes) {
                free(node);
                break;
           case AST_PROCESS_CALL:
-               printf("Processing AST_PROCESS_CALL\n");
+               printf("Processing AST_PROCESS_CALL: %s\n", node->token.ast_process_call.name);
                free(node->token.ast_process_call.name);
                free(node);
                break;
@@ -74,13 +74,17 @@ void traverse_list(ast_T** nodeList, int numNodes) {
                free(node);
                break;
           case AST_VARIABLE_DEFINITION:
-                printf("Processing AST_VARIABLE_DEFINITION: %s\n", node->token.ast_variable_definition.name);
+               if(node->token.ast_variable_definition.name != NULL){
+                    printf("Processing AST_VARIABLE_DEFINITION: %s\n", node->token.ast_variable_definition.name);
+               }
+               stmt[0] = node->token.ast_variable_definition.value;
+               traverse_list(stmt, 1);
                //printf("freeing token type %s: %p\n", node->token.ast_variable_definition.type, node->token.ast_variable_definition.type);
                free(node->token.ast_variable_definition.type);
                //printf("freeing token type %s: %p\n", node->token.ast_variable_definition.name, node->token.ast_variable_definition.name);
                free(node->token.ast_variable_definition.name);
                //printf("freeing token type %d: %p\n", node->token.ast_variable_definition.value->type, node->token.ast_variable_definition.value);
-               free(node->token.ast_variable_definition.value);
+              /* free(node->token.ast_variable_definition.value);*/
                free(node);
                break;
           case AST_EMIT:
@@ -101,57 +105,79 @@ void traverse_list(ast_T** nodeList, int numNodes) {
           case AST_CONDITIONAL:
                printf("Processing AST_CONDITIONAL: \n");
                stmt[0] = node->token.ast_conditional.condition;
-               traverse_list(stmt, node->numNodes); // Recursively process the body
-               traverse_list(node->token.ast_conditional.then_stmts, node->numNodes); // Recursively process the body
-               traverse_list(node->token.ast_conditional.else_stmts, node->numNodes); // Recursively process the body
+               traverse_list(stmt, 1); // Recursively process the body
+               traverse_list(node->token.ast_conditional.then_stmts, 1); // Recursively process the body
+               traverse_list(node->token.ast_conditional.else_stmts, 1); // Recursively process the body
+               ////printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
+               //free(node->token.ast_main.body);
+               free(node);
+               break;
+          case AST_EXPRESSION:
+               if (node->token.ast_expression.operator != NULL) {
+                    printf("Processing AST_EXPRESSION: %s\n", node->token.ast_expression.operator);
+               }
+               stmt[0] = node->token.ast_expression.left;
+               traverse_list(stmt, 1); // Recursively process the body
+               stmt[0] = node->token.ast_expression.right;
+               traverse_list(stmt, 1); // Recursively process the body
                ////printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
                //free(node->token.ast_main.body);
                free(node);
                break;
           case AST_EQUALITY:
-               printf("Processing AST_EQUALITY: %s\n", node->token.ast_equality.operator);
+               if (node->token.ast_expression.operator != NULL) {
+                    printf("Processing AST_EQUALITY: %s\n", node->token.ast_equality.operator);
+               }
                stmt[0] = node->token.ast_equality.left;
-               traverse_list(stmt, node->numNodes); // Recursively process the body
+               traverse_list(stmt, 1); // Recursively process the body
                stmt[0] = node->token.ast_equality.right;
-               traverse_list(stmt, node->numNodes); // Recursively process the body
+               traverse_list(stmt, 1); // Recursively process the body
                ////printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
                //free(node->token.ast_main.body);
                free(node);
                break;
           case AST_COMPARISON:
-               printf("Processing AST_COMPARISON: %s\n", node->token.ast_comparison.operator);
+               if (node->token.ast_comparison.operator != NULL) {
+                    printf("Processing AST_COMPARISON: %s\n", node->token.ast_comparison.operator);
+               }
                stmt[0] = node->token.ast_comparison.left;
-               traverse_list(stmt, node->numNodes); // Recursively process the body
+               traverse_list(stmt, 1); // Recursively process the body
                stmt[0] = node->token.ast_comparison.right;
-               traverse_list(stmt, node->numNodes); // Recursively process the body
+               traverse_list(stmt, 1); // Recursively process the body
                ////printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
                //free(node->token.ast_main.body);
                free(node);
                break;
           case AST_TERM:
-               printf("Processing AST_TERM: %s\n", node->token.ast_term.operator);
+               if (node->token.ast_term.operator != NULL) {
+                    printf("Processing AST_TERM: %s\n", node->token.ast_term.operator);
+               }
                stmt[0] = node->token.ast_term.left;
-               traverse_list(stmt, node->numNodes); // Recursively process the body
+               traverse_list(stmt, 1); // Recursively process the body
                stmt[0] = node->token.ast_term.right;
-               traverse_list(stmt, node->numNodes); // Recursively process the body
+               traverse_list(stmt, 1); // Recursively process the body
                ////printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
                //free(node->token.ast_main.body);
                free(node);
                break;
           case AST_FACTOR:
-               printf("Processing AST_FACTOR: %s\n", node->token.ast_factor.operator);
+               if (node->token.ast_factor.operator != NULL) {
+                    printf("Processing AST_FACTOR: %s\n", node->token.ast_factor.operator);
+               }
                stmt[0] = node->token.ast_factor.left;
-               traverse_list(stmt, node->numNodes); // Recursively process the body
+               traverse_list(stmt, 1); // Recursively process the body
                stmt[0] = node->token.ast_factor.right;
-               traverse_list(stmt, node->numNodes); // Recursively process the body
+               traverse_list(stmt, 1); // Recursively process the body
                ////printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
                //free(node->token.ast_main.body);
                free(node);
                break;
           case AST_UNARY:
-               printf("Processing AST_UNARY: %s\n", node->token.ast_unary.operator);
+               if (node->token.ast_unary.operator != NULL) {
+                    printf("Processing AST_UNARY: %s\n", node->token.ast_unary.operator);
+               }
                stmt[0] = node->token.ast_unary.stmt;
-               traverse_list(stmt, node->numNodes); // Recursively process the body
+               traverse_list(stmt, 1); // Recursively process the body
                ////printf("freeing token type %d: %p\n", node->type, node->token.ast_main.body);
                //free(node->token.ast_main.body);
                free(node);

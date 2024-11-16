@@ -71,30 +71,38 @@ ast_T* parser_parse_statement(parser_T* parser){
           // Literals
           case TOKEN_ID: return parser_parse_id(parser); break;
           case TOKEN_INT_TYPE: return parser_parse_int_variable_definition(parser);
+          case TOKEN_BOOLEAN_TYPE: return parser_parse_boolean_variable_definition(parser);
           case TOKEN_PROCESS: return parser_parse_process_definition(parser);
           case TOKEN_FUNC: return parser_parse_func_definition(parser);
           case TOKEN_HELPER: return parser_parse_helper_definition(parser);
           case TOKEN_EMIT: return parser_parse_emit(parser);
           case TOKEN_IS: return parser_parse_conditional(parser);
-          case TOKEN_PLUS:
-          case TOKEN_MINUS:
-               return parser_parse_term(parser);
-          case TOKEN_STAR:
-          case TOKEN_DIVIDE:
-               return parser_parse_factor(parser);
-          case TOKEN_GREATER:
-          case TOKEN_GREATER_EQUAL:
-          case TOKEN_LESS:
-          case TOKEN_LESS_EQUAL:
-               return parser_parse_comparison(parser);
+          case TOKEN_EXPRESSION_INT:
+          case TOKEN_EXPRESSION_DOUBLE: 
+          case TOKEN_EXPRESSION_STRING:
+          case TOKEN_EXPRESSION_CHAR:
+          case TOKEN_EXPRESSION_BOOLEAN:
+               return parser_parse_expression(parser);
+          //case TOKEN_PLUS:
+          //case TOKEN_MINUS:
+          //     return parser_parse_term(parser);
+          //case TOKEN_STAR:
+          //case TOKEN_DIVIDE:
+          //     return parser_parse_factor(parser);
+          //case TOKEN_GREATER:
+          //case TOKEN_GREATER_EQUAL:
+          //case TOKEN_LESS:
+          //case TOKEN_LESS_EQUAL:
+          //     return parser_parse_comparison(parser);
           //case TOKEN_DIVIDE:
           //     return parser_parse_factor(parser);
           case TOKEN_INT:
           case TOKEN_STRING: 
           case TOKEN_DOUBLE:
-          case TOKEN_BOOLEAN:
           case TOKEN_CHARACTER:
                return parser_parse_int(parser);
+          case TOKEN_BOOLEAN:
+               return parser_parse_boolean(parser);
      }
 
      return init_ast(AST_NOOP);
@@ -106,10 +114,23 @@ ast_T* parser_parse_unary(parser_T* parser) {
      while (parser->current_token->type == TOKEN_BANG) {
           node->token.ast_unary.operator = parser->current_token->value;
           parser_move_forward(parser, parser->current_token->type);
-          node->token.ast_unary.stmt = parser_parse_statement(parser);
      }
 
-     return parser_parse_statement(parser);
+     if (parser->current_token->type == TOKEN_EXPRESSION_INT) {
+          parser->current_token->type = TOKEN_INT;
+     } else if (parser->current_token->type == TOKEN_EXPRESSION_DOUBLE) {
+          parser->current_token->type = TOKEN_DOUBLE;
+     }else if (parser->current_token->type == TOKEN_EXPRESSION_STRING) {
+          parser->current_token->type = TOKEN_STRING;
+     }else if (parser->current_token->type == TOKEN_EXPRESSION_CHAR) {
+          parser->current_token->type = TOKEN_CHARACTER;
+     }else if (parser->current_token->type == TOKEN_EXPRESSION_BOOLEAN) {
+          parser->current_token->type = TOKEN_BOOLEAN;
+     }
+
+     node->token.ast_unary.stmt = parser_parse_statement(parser);
+
+     return node;
 }
 
 ast_T* parser_parse_factor(parser_T* parser) {
@@ -171,6 +192,20 @@ ast_T* parser_parse_equality(parser_T* parser) {
      return node;
 }
 
+ast_T* parser_parse_expression(parser_T* parser) {
+     ast_T* node = init_ast(AST_EXPRESSION);
+
+     node->token.ast_expression.left = parser_parse_equality(parser);
+
+     while (parser->current_token->type == TOKEN_AND || parser->current_token->type == TOKEN_OR) {
+          node->token.ast_expression.operator = parser->current_token->value;
+          parser_move_forward(parser, parser->current_token->type);
+          node->token.ast_expression.right = parser_parse_equality(parser);
+     }
+
+     return node;
+}
+
 
 
 ast_T* parser_parse_conditional(parser_T* parser) {
@@ -179,7 +214,7 @@ ast_T* parser_parse_conditional(parser_T* parser) {
      parser_move_forward(parser, TOKEN_LPAREN);
 
     
-     node->token.ast_conditional.condition = parser_parse_equality(parser);
+     node->token.ast_conditional.condition = parser_parse_statement(parser);
 
      parser_move_forward(parser, TOKEN_RPAREN);
      parser_move_forward(parser, TOKEN_LCURLY);
@@ -187,26 +222,26 @@ ast_T* parser_parse_conditional(parser_T* parser) {
      // then body
      int num = 0;
      
-     //while (parser->current_token->type != TOKEN_RCURLY) {
-     //     ast_T* statement = parser_parse_statement(parser);
-     //     node->token.ast_conditional.then_stmts = realloc(node->token.ast_conditional.then_stmts, (num + 1) * sizeof(ast_T*));
-     //     node->token.ast_conditional.then_stmts[num] = statement;
-     //     num += 1;
-     //}
+     while (parser->current_token->type != TOKEN_RCURLY) {
+          ast_T* statement = parser_parse_statement(parser);
+          node->token.ast_conditional.then_stmts = realloc(node->token.ast_conditional.then_stmts, (num + 1) * sizeof(ast_T*));
+          node->token.ast_conditional.then_stmts[num] = statement;
+          num += 1;
+     }
 
      parser_move_forward(parser, TOKEN_RCURLY);
      parser_move_forward(parser, TOKEN_ELSE);
      parser_move_forward(parser, TOKEN_LCURLY);
 
      //else body
-     //num = 0;
+     num = 0;
 
-     //while (parser->current_token->type != TOKEN_RCURLY) {
-     //     ast_T* statement = parser_parse_statement(parser);
-     //     node->token.ast_conditional.else_stmts = realloc(node->token.ast_conditional.else_stmts, (num + 1) * sizeof(ast_T*));
-     //     node->token.ast_conditional.else_stmts[num] = statement;
-     //     num += 1;
-     //}
+     while (parser->current_token->type != TOKEN_RCURLY) {
+          ast_T* statement = parser_parse_statement(parser);
+          node->token.ast_conditional.else_stmts = realloc(node->token.ast_conditional.else_stmts, (num + 1) * sizeof(ast_T*));
+          node->token.ast_conditional.else_stmts[num] = statement;
+          num += 1;
+     }
 
      parser_move_forward(parser, TOKEN_RCURLY);
 
@@ -258,10 +293,39 @@ ast_T* parser_parse_int(parser_T* parser) {
      return node;
 }
 
+ast_T* parser_parse_boolean(parser_T* parser) {
+     ast_T* node = init_ast(AST_BOOLEAN);
+     node->token.ast_boolean = (strcmp(parser->current_token->value, "true") == 0);
+     // free(parser->current_token->value);
+     parser_move_forward(parser, TOKEN_BOOLEAN);
+
+     return node;
+}
+
 ast_T* parser_parse_int_variable_definition(parser_T* parser){
      ast_T* node = init_ast(AST_VARIABLE_DEFINITION);
      node->token.ast_variable_definition.type = parser->current_token->value;
      parser_move_forward(parser, TOKEN_INT_TYPE);
+     //printf("// freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
+     // free(parser->prev_token);
+     node->token.ast_variable_definition.name = parser->current_token->value;
+     parser_move_forward(parser, TOKEN_ID);
+     //printf("// freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
+     // free(parser->prev_token);
+     parser_move_forward(parser, TOKEN_EQUALS);
+     node->token.ast_variable_definition.value = parser_parse_statement(parser);
+     //printf("// freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
+     // free(parser->prev_token);
+     parser_move_forward(parser, TOKEN_SEMICOLON);
+     node->numNodes = 0;
+
+     return node;
+}
+
+ast_T* parser_parse_boolean_variable_definition(parser_T* parser) {
+     ast_T* node = init_ast(AST_VARIABLE_DEFINITION);
+     node->token.ast_variable_definition.type = parser->current_token->value;
+     parser_move_forward(parser, TOKEN_BOOLEAN_TYPE);
      //printf("// freeing token type %d: %p\n", parser->prev_token->type, parser->prev_token);
      // free(parser->prev_token);
      node->token.ast_variable_definition.name = parser->current_token->value;

@@ -22,7 +22,9 @@ static const struct {
 	{"double",	  TOKEN_DOUBLE_TYPE},
 	{"string",	  TOKEN_STRING_TYPE},
 	{"char",	  TOKEN_CHAR_TYPE},
-	{"boolean",	  TOKEN_BOOLEAN_TYPE}
+	{"boolean",	  TOKEN_BOOLEAN_TYPE},
+	{"true",		TOKEN_BOOLEAN},
+	{"false",		TOKEN_BOOLEAN}
 };
 
 typedef struct LEXER_STRUCT {
@@ -48,5 +50,9 @@ token_T* lexer_parse_identifier(lexer_T* lexer); // how should we parse stuff in
 
 token_T* lexer_read_forward_with_token(lexer_T* lexer, token_T* token); // how should we parse stuff in "<text>"
 
+char lexer_look_forward(lexer_T* lexer);
+
 char* lexer_get_current_char_as_string(lexer_T* lexer); // return char c as a string
+
+char* lexer_get_next_char_as_string(lexer_T* lexer);
 #endif
