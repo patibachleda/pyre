@@ -1,36 +1,30 @@
-process add(int a, int b){
-     int func(){
-          paramsInBoundCheck()
-          is (isParamInBound){
-               emit data1(a+b);
-          } elis (<some other thing>){
-           // do stuff
-          } else {
-           // do something else
+process add(){
+     func(){
+          if( paramsInBoundCheck){
+               int c = 3 + 2;
+          } else{
+               int d = 2;
           }
           
-          emit data1(a+a);
+          boolean a = false;
+          emit 2;
      }
 
      // you can have if/else statements like this
      // you can also exclude the yes/no and it the inside of the statement will be 'yes'
-     helper boolean paramsInBoundCheck(){
-          is (a < 10 and is b < 5){
-               yes {
-                    emit isParamInBound(true);
-               }
-               no {
-                    emit isParamInBound(false);
-               }
+     helper paramsInBoundCheck(){
+          if (3 > 1 == 3 > 2 and 1 == 1){
+               int c = 3;
+          } else{
+               int d = 2;
           }
      }
 }
 
-
-process multiple(int data1){
-     int func(){
+process multiple(){
+     func(){
           print();
-          emit data2(data1 * 5);
+          emit 5;
      }
 }
 
@@ -41,5 +35,5 @@ process multiple(int data1){
 // each func is allowed to have helper methods using the helper keyword
 // the main method defines the start of the program flow
 main(){
-     add(a: 3, 4) -> multiple(data1) -> print(data2);
+     add() -> multiple() -> print();
 }

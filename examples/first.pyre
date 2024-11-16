@@ -1,14 +1,20 @@
-main(){
-     int a = 3;
-     if (a == 3.2){
-          print(a);
-          >=
-          // comments get ignored
-          <=
-          !=
-          >
-          <
-          !
-          // comments get ingnored
+process hi3(){
+     func(){
+          if( 2 == 2){
+               int c = 3;
+          } else{
+               int d = 2;
+          }
+          
      }
+
+     helper hi4(){
+          int d = 4;
+          emit 4;
+     }
+}
+
+
+main(){
+     hi3() -> hi4();
 }

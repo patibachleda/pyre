@@ -8,8 +8,8 @@ static const struct {
 } keywords[] = {
 	{"and",     TOKEN_AND},
 	{"or",    TOKEN_OR},
-	{"is",       TOKEN_IS},
-	{"elis",     TOKEN_ELIS},
+	{"if",       TOKEN_IS},
+	{"elif",     TOKEN_ELIS},
 	{"else",     TOKEN_ELSE},
 	{"process",    TOKEN_PROCESS},
 	{"func",      TOKEN_FUNC},
@@ -17,11 +17,18 @@ static const struct {
 	{"helper",      TOKEN_HELPER},
 	{"while",      TOKEN_WHILE},
 	{"for",      TOKEN_FOR},
-	{"emit",    TOKEN_EMIT}
+	{"emit",    TOKEN_EMIT},
+	{"int",	  TOKEN_INT_TYPE},
+	{"double",	  TOKEN_DOUBLE_TYPE},
+	{"string",	  TOKEN_STRING_TYPE},
+	{"char",	  TOKEN_CHAR_TYPE},
+	{"boolean",	  TOKEN_BOOLEAN_TYPE},
+	{"true",		TOKEN_BOOLEAN},
+	{"false",		TOKEN_BOOLEAN}
 };
 
 typedef struct LEXER_STRUCT {
-     char* current_char;
+     char current_char;
      unsigned int index;
      char* contents;
 } lexer_T;
@@ -43,5 +50,9 @@ token_T* lexer_parse_identifier(lexer_T* lexer); // how should we parse stuff in
 
 token_T* lexer_read_forward_with_token(lexer_T* lexer, token_T* token); // how should we parse stuff in "<text>"
 
+char lexer_look_forward(lexer_T* lexer);
+
 char* lexer_get_current_char_as_string(lexer_T* lexer); // return char c as a string
+
+char* lexer_get_next_char_as_string(lexer_T* lexer);
 #endif

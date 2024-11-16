@@ -8,15 +8,18 @@
 
 <Process> ::= "process" IDENTIFIER "(" <ArgList> ")" "{" <Function> <Helper>* "}"
 
+<Func> ::=  <TYPE> "func" "(" ")" "{" <Stmt>* "}"
+
+<Helper> ::= "helper" <Type> IDENTIFIER "(" <ArgList> ")" "{" <Stmt>* "}"
+
 <Main> ::= "main" "(" ")" "{" <Stmt>* "}"
+
+
 
 <ProcessCall> ::= IDENTIFIER "(" <ArgList>  ")" ("->" IDENTIFIER "(" <ArgList>  ")")*
 
 <HelperCall> ::= IDENTIFIER "(" <ArgList>  ")"
 
-<Function> ::=  TYPE "func" "(" ")" "{" <Stmt>* "}"
-
-<Helper> ::= "helper" <Type> IDENTIFIER "(" <ArgList> ")" "{" <Stmt>* "}"
 
 <Stmt> ::= <Emit>
          | <IfElse>
@@ -30,8 +33,8 @@
 
 <VarDec> ::= <Type> IDENTIFIER "=" IDENTIFER
 
-<IfElse> ::= "is" "(" <BooleanExpr> ")" "{" "yes" "{" <Stmt>* "}" "no" "{" <Stmt>* "}" "}"
-           | "is" "(" <BooleanExpr> ")" "{" <Stmt>* "}"
+<Conditional> ::= "is" "(" <BooleanExpr> ")" "{" "yes" "{" <Stmt>* "}" "no" "{" <Stmt>* "}" "}"
+               | "is" "(" <BooleanExpr> ")" "{" <Stmt>* "}"
 
 
 <BooleanExpr> ::= <BooleanTerm> ("or" <BooleanTerm>)*
@@ -52,11 +55,10 @@
 
 <BooleanLiteral> ::= "true" | "false"
 
-<Expr> ::= <Term> ( ("+" | "-") <Term> )*
+<Binary> ::= <Expr> ( ("+" | "-" | "*" | "/" ) <Expr> )*
 
-<Term> ::= <Factor> ( ("*" | "/") <Factor> )*
 
-<Factor> ::= IDENTIFIER
+<Expr> ::= IDENTIFIER
            | NUMBER
            | "(" <Expr> ")"
            | <FuncCall>

@@ -1,0 +1,39 @@
+process add(int a, int b){
+     int func(){
+          paramsInBoundCheck()
+          if (isParamInBound){
+               emit data1(a+b);
+          }else {
+           // do something else
+          }
+          
+          emit data1(a+a);
+     }
+
+     // you can have if/else statements like this
+     // you can also exclude the yes/no and it the inside of the statement will be 'yes'
+     helper boolean paramsInBoundCheck(){
+          if (a < 10 and is b < 5){
+               emit isParamInBound(true);
+          } else {
+               emit isParamInBound(false);
+          }
+     }
+}
+
+process multiple(int data1){
+     int func(){
+          print();
+          emit data2(data1 * 5);
+     }
+}
+
+
+// print is a built in method
+// each process is a group of logic
+// func defines the main logic flow
+// each func is allowed to have helper methods using the helper keyword
+// the main method defines the start of the program flow
+main(){
+     add(a: 3, 4) -> multiple(data1) -> print(data2);
+}
