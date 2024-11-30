@@ -41,8 +41,10 @@ struct AST_NODE {
           AST_ARG_LIST,
           AST_NAMED_ARG,
           AST_TYPE,
-          AST_STRING,
           AST_INT,
+          AST_DOUBLE,
+          AST_STRING,
+          AST_CHARACTER,
           AST_LIST_OF_NODES,
           AST_UNARY,
           AST_EQUALITY,
@@ -65,6 +67,7 @@ struct AST_NODE {
 
           // have to still do stmt lists
           struct AST_CONDITIONAL { ast_T* condition; ast_T** then_stmts; ast_T** else_stmts; } ast_conditional; // !=, ==
+          
           // from crafting interpretters
           struct AST_EXPRESSION { ast_T* left; char* operator; ast_T* right; } ast_expression;
           struct AST_EQUALITY { ast_T* left; char* operator; ast_T* right; } ast_equality;
@@ -73,15 +76,15 @@ struct AST_NODE {
           struct AST_FACTOR { ast_T* left; char* operator; ast_T* right; } ast_factor; // * /
           struct AST_UNARY { char* operator; ast_T* stmt; } ast_unary; // !
 
+          struct AST_ARG_LIST { ast_T** args; } ast_arg_list;
+          struct AST_NAMED_ARG { char* name; ast_T* expression; } ast_named_arg;
+          struct AST_DECLARED_ARG { char* type;  char* name;  } ast_declared_arg;
 
-          //struct AST_ARG_LIST { ast_T** args; } ast_arg_list;
-          //struct AST_NAMED_ARG { char* id; char* arg; } ast_named_arg;
-          //
 
-          char* string_literal;
-          char character_literal;
+          char* ast_string;
+          char ast_character;
           int ast_int;
-          double doub_literal;
+          double ast_double;
           bool ast_boolean;
      } token;
 

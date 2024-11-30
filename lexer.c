@@ -86,7 +86,7 @@ token_T* lexer_get_next_token(lexer_T* lexer) {
                return lexer_parse_identifier(lexer);
           }
 
-          if (isdigit(lexer->current_char)) { //start of a identifier
+          if (isdigit(lexer->current_char)) {
                return lexer_parse_number(lexer);
           }
 
@@ -170,6 +170,8 @@ token_T* lexer_get_next_token(lexer_T* lexer) {
                }
                case '"':
                     return lexer_parse_string(lexer); break;
+               case '\'':
+                    return lexer_parse_character(lexer); break;
 
                default: printf("Unexpected character %c on line %d", lexer->current_char, line); exit(3); break;
           }
@@ -195,6 +197,25 @@ token_T* lexer_parse_string(lexer_T* lexer) {
      lexer_move_forward(lexer, 1);
 
      return init_token(TOKEN_STRING, string, get_line_num(lexer));
+}
+
+token_T* lexer_parse_character(lexer_T* lexer) {
+     lexer_move_forward(lexer, 1);
+     char* string = calloc(1, sizeof(char));
+     string[0] = '\0';
+
+     while (lexer->current_char != '\'') { // read everything inside of string
+          char* s = lexer_get_current_char_as_string(lexer);
+          string = realloc(string, (strlen(string) + strlen(s) + 1) * sizeof(char));
+          strcat(string, s);
+          free(s);
+
+          lexer_move_forward(lexer, 1);
+     }
+
+     lexer_move_forward(lexer, 1);
+
+     return init_token(TOKEN_CHARACTER, string, get_line_num(lexer));
 }
 
 token_T* lexer_parse_number(lexer_T* lexer) {

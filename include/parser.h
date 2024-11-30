@@ -24,11 +24,15 @@ ast_T* parser_parse_term(parser_T* parser);
 
 ast_T* parser_parse_function_call(parser_T* parser);
 
-ast_T* parser_parse_int_variable_definition(parser_T* parser);
-
-ast_T* parser_parse_boolean_variable_definition(parser_T* parser);
+ast_T* parser_parse_variable_definition(parser_T* parser, int type);
 
 ast_T* parser_parse_int(parser_T* parser);
+
+ast_T* parser_parse_double(parser_T* parser);
+
+ast_T* parser_parse_string(parser_T* parser);
+
+ast_T* parser_parse_character(parser_T* parser);
 
 ast_T* parser_parse_boolean(parser_T* parser);
 
@@ -64,6 +68,9 @@ ast_T* parser_parse_expression(parser_T* parser);
 
 ast_T* parser_parse_conditional(parser_T* parser);
 
-void parser_parse_arguments_definition(parser_T* parser);
+ast_T* parser_parse_arguments_declared(parser_T* parser);
+
+ast_T* parser_parse_arguments_called(parser_T* parser);
+
 
 #endif
