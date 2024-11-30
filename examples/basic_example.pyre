@@ -7,6 +7,8 @@ process add(){
           }
           
           boolean a = false;
+          string b = "hi";
+          char c = 'f';
           emit 2;
      }
 

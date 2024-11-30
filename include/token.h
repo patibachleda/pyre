@@ -43,25 +43,26 @@ typedef struct TOKEN_STRUCT {
 
           // Syntax
           TOKEN_SEMICOLON, // 31
-          TOKEN_COMMA, // 32
-          TOKEN_DOT, // 33
-          TOKEN_LPAREN, // 34
-          TOKEN_RPAREN, // 35
-          TOKEN_LCURLY, // 36
-          TOKEN_RCURLY, // 37
+          TOKEN_COLON, // 32
+          TOKEN_COMMA, // 33
+          TOKEN_DOT, // 34
+          TOKEN_LPAREN, // 35
+          TOKEN_RPAREN, // 36
+          TOKEN_LCURLY, // 37
+          TOKEN_RCURLY, // 38
 
           // Types
-          TOKEN_INT_TYPE, // 38
-          TOKEN_DOUBLE_TYPE, // 39
-          TOKEN_STRING_TYPE, // 40
-          TOKEN_CHAR_TYPE, // 41
-          TOKEN_BOOLEAN_TYPE, //42
+          TOKEN_INT_TYPE, // 39
+          TOKEN_DOUBLE_TYPE, // 40
+          TOKEN_STRING_TYPE, // 41
+          TOKEN_CHAR_TYPE, // 42
+          TOKEN_BOOLEAN_TYPE, // 43
 
-          TOKEN_EXPRESSION_INT,
-          TOKEN_EXPRESSION_DOUBLE,
-          TOKEN_EXPRESSION_STRING,
-          TOKEN_EXPRESSION_CHAR,
-          TOKEN_EXPRESSION_BOOLEAN
+          TOKEN_EXPRESSION_INT, // 44
+          TOKEN_EXPRESSION_DOUBLE, // 45
+          TOKEN_EXPRESSION_STRING, // 46
+          TOKEN_EXPRESSION_CHAR, // 47
+          TOKEN_EXPRESSION_BOOLEAN // 48
      } type;
 
      char* value;

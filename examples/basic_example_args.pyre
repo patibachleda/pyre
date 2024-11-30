@@ -2,7 +2,7 @@ process add(int a, int b){
      int func(){
           paramsInBoundCheck()
           if (isParamInBound){
-               emit data1(a+b);
+               emit a+b;
           }else {
            // do something else
           }
