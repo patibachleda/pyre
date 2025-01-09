@@ -284,6 +284,8 @@ token_T* lexer_parse_identifier(lexer_T* lexer) {
           }
      }
 
+     // TO-DO: check if variable expression start (like did with TOKEN_EXPRESSION_DOUBLE)
+
      return init_token(TOKEN_ID, identifier, line_num);
 }
 

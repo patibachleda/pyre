@@ -39,6 +39,7 @@ struct AST_NODE {
           AST_TERM,
           AST_FACTOR,
           AST_ARG_LIST,
+          AST_DECLARED_ARG,
           AST_NAMED_ARG,
           AST_TYPE,
           AST_INT,
@@ -54,14 +55,14 @@ struct AST_NODE {
 
      union Token {
           struct AST_MAIN { ast_T** body; } ast_main;
-          struct AST_PROCESS_DEFINITION { char* name; ast_T* func;  ast_T** helpers; } ast_process_definition;
+          struct AST_PROCESS_DEFINITION { char* return_type; char* name; ast_T* args;  ast_T* func;  ast_T** helpers; } ast_process_definition;
           struct AST_FUNC_DEFINITION { ast_T** body; } ast_func_definition;
-          struct AST_HELPER_DEFINITION { char* name; ast_T** body; } ast_helper_definition;
+          struct AST_HELPER_DEFINITION { char* return_type; char* name; ast_T* args; ast_T** body; } ast_helper_definition;
           struct AST_VARIABLE_DEFINITION { char* type; char* name; ast_T* value; } ast_variable_definition;
           struct AST_VARIABLE { char* name; } ast_variable;
           struct AST_BINARY { char* operator; ast_T* left; ast_T* right; } ast_binary;
 
-          struct AST_PROCESS_CALL { char* name; ast_T** arguments;  } ast_process_call;
+          struct AST_PROCESS_CALL { char* name; ast_T* args; ast_T** arguments;  } ast_process_call;
           //struct AST_HELPER_CALL { char* name; ast_T** arguments; } ast_helper_call;
           struct AST_EMIT { ast_T* stmt; } ast_emit;
 

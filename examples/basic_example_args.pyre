@@ -1,6 +1,6 @@
-process add(int a, int b){
-     int func(){
-          paramsInBoundCheck()
+process int add(int a, int b){
+     func(){
+          paramsInBoundCheck();
           if (isParamInBound){
                emit a+b;
           }else {
@@ -21,8 +21,8 @@ process add(int a, int b){
      }
 }
 
-process multiple(int data1){
-     int func(){
+process int multiple(int data1){
+     func(){
           print();
           emit data2(data1 * 5);
      }

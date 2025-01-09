@@ -1,6 +1,6 @@
 process add(){
      func(){
-          if( paramsInBoundCheck){
+          if( paramsInBoundCheck()){
                int c = 3 + 2;
           } else{
                int d = 2;
