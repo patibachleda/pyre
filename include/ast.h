@@ -41,6 +41,7 @@ struct AST_NODE {
           AST_ARG_LIST,
           AST_DECLARED_ARG,
           AST_NAMED_ARG,
+          AST_UNNAMED_ARG,
           AST_TYPE,
           AST_INT,
           AST_DOUBLE,
@@ -79,6 +80,7 @@ struct AST_NODE {
 
           struct AST_ARG_LIST { ast_T** args; } ast_arg_list;
           struct AST_NAMED_ARG { char* name; ast_T* expression; } ast_named_arg;
+          struct AST_UNNAMED_ARG { ast_T* expression; } ast_unnamed_arg;
           struct AST_DECLARED_ARG { char* type;  char* name;  } ast_declared_arg;
 
 

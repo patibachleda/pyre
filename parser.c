@@ -1,6 +1,7 @@
 #include "include/parser.h"
 #include "include/ast.h"
 #include <stdio.h>
+#include <string.h>
 
 parser_T* init_parser(lexer_T* lexer) {
      parser_T* parser = calloc(1, sizeof(struct PARSER_STRUCT));
@@ -46,8 +47,7 @@ ast_T* parser_parse_statement(parser_T* parser){
           case TOKEN_IS: return parser_parse_conditional(parser);
           case TOKEN_EXPRESSION_INT:
           case TOKEN_EXPRESSION_DOUBLE: 
-          case TOKEN_EXPRESSION_STRING:
-          case TOKEN_EXPRESSION_CHAR:
+          case TOKEN_EXPRESSION_IDENTIFIER:
           case TOKEN_EXPRESSION_BOOLEAN:
                return parser_parse_expression(parser);
           case TOKEN_INT:
@@ -152,11 +152,7 @@ ast_T* parser_parse_id(parser_T* parser) {
           node->token.ast_process_call.name = name;
           node->token.ast_process_call.args = parser_parse_arguments_called(parser);
 
-          if (parser->current_token->type == TOKEN_ARROW) {
-               parser_move_forward(parser, TOKEN_ARROW);
-
-          }
-          else {
+          if (parser->current_token->type == TOKEN_SEMICOLON) {
                parser_move_forward(parser, TOKEN_SEMICOLON);
           }
      }
@@ -241,10 +237,19 @@ ast_T* parser_parse_func_definition(parser_T* parser) {
 ast_T* parser_parse_helper_definition(parser_T* parser) {
      ast_T* helper_node = init_ast(AST_HELPER_DEFINITION);
      parser_move_forward(parser, TOKEN_HELPER);
-     helper_node->token.ast_helper_definition.name = parser->current_token->value;
+
+     // return type
+     helper_node->token.ast_process_definition.return_type = parser->current_token->value;
+     parser_move_forward(parser, parser->current_token->type);
+
+     // name
+     helper_node->token.ast_process_definition.name = parser->current_token->value;
      parser_move_forward(parser, TOKEN_ID);
 
-     helper_node->token.ast_helper_definition.args = parser_parse_arguments_declared(parser);
+     // args 
+     helper_node->token.ast_process_definition.args = parser_parse_arguments_declared(parser);
+
+     // body
      parser_move_forward(parser, TOKEN_LCURLY);
 
      int num = 0;
@@ -284,7 +289,6 @@ ast_T* parser_parse_arguments_declared(parser_T* parser) {
           }
      }
 
-
      parser_move_forward(parser, TOKEN_RPAREN);
 
      return node;
@@ -298,16 +302,38 @@ ast_T* parser_parse_arguments_called(parser_T* parser) {
 
      while (parser->current_token->type != TOKEN_RPAREN) {
           node->token.ast_arg_list.args = realloc(node->token.ast_arg_list.args, (num + 1) * sizeof(ast_T*));
-          node->token.ast_arg_list.args[num]->token.ast_named_arg.name = parser->current_token->value;
-          parser_move_forward(parser, TOKEN_ID);
-          parser_move_forward(parser, TOKEN_COLON);
-          ast_T* statement = parser_parse_statement(parser);
-          node->token.ast_arg_list.args[num]->token.ast_named_arg.expression = statement;
+          
+          // (val) (name: val)
+          ast_T* arg = NULL;
+
+          if (parser->lexer->current_char ==  ':') { // if named arg
+               arg = init_ast(AST_NAMED_ARG);
+               arg->token.ast_named_arg.name = parser->prev_token->value;
+               parser_move_forward(parser, TOKEN_ID);
+               parser_move_forward(parser, TOKEN_COLON);
+               arg->token.ast_named_arg.expression = parser_parse_statement(parser);
+          }
+          else { // if unnamed arg
+               arg = init_ast(AST_UNNAMED_ARG);
+               arg->token.ast_unnamed_arg.expression = parser_parse_statement(parser);
+
+          }
+          node->token.ast_arg_list.args[num] = arg;
           num += 1;
           node->numNodes = num;
+          if (parser->current_token->type == TOKEN_COMMA) {
+               parser_move_forward(parser, TOKEN_COMMA);
+          }
      }
 
      parser_move_forward(parser, TOKEN_RPAREN);
+     if (parser->current_token->type == TOKEN_ARROW) {
+          parser_move_forward(parser, TOKEN_ARROW);
+
+     }
+     else if (parser->current_token->type == TOKEN_SEMICOLON) {
+          parser_move_forward(parser, TOKEN_SEMICOLON);
+     }
 
      return node;
 }
@@ -357,6 +383,10 @@ ast_T* parser_parse_expression(parser_T* parser) {
           node->token.ast_expression.operator = parser->current_token->value;
           parser_move_forward(parser, parser->current_token->type);
           node->token.ast_expression.right = parser_parse_equality(parser);
+     }
+
+     if (parser->current_token->type == TOKEN_SEMICOLON) {
+          parser_move_forward(parser, TOKEN_SEMICOLON);
      }
 
      return node;
@@ -435,11 +465,8 @@ ast_T* parser_parse_unary(parser_T* parser) {
      else if (parser->current_token->type == TOKEN_EXPRESSION_DOUBLE) {
           parser->current_token->type = TOKEN_DOUBLE;
      }
-     else if (parser->current_token->type == TOKEN_EXPRESSION_STRING) {
-          parser->current_token->type = TOKEN_STRING;
-     }
-     else if (parser->current_token->type == TOKEN_EXPRESSION_CHAR) {
-          parser->current_token->type = TOKEN_CHARACTER;
+     else if (parser->current_token->type == TOKEN_EXPRESSION_IDENTIFIER) {
+          parser->current_token->type = TOKEN_ID;
      }
      else if (parser->current_token->type == TOKEN_EXPRESSION_BOOLEAN) {
           parser->current_token->type = TOKEN_BOOLEAN;
@@ -498,6 +525,8 @@ ast_T* parser_parse_emit(parser_T* parser) {
      ast_T* node = init_ast(AST_EMIT);
      parser_move_forward(parser, TOKEN_EMIT);
      node->token.ast_emit.stmt = parser_parse_statement(parser);
-     parser_move_forward(parser, TOKEN_SEMICOLON);
+     if (parser->current_token->type == TOKEN_SEMICOLON) {
+          parser_move_forward(parser, TOKEN_SEMICOLON);
+     }
      return node;
 }

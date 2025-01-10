@@ -6,6 +6,8 @@
 #include <ctype.h>
 #include <stdio.h>
 
+char* expression_op[8] = { "+", "-", "/", "*", "<=", "<", ">=", ">" };
+
 lexer_T* init_lexer(char* contents) {
      lexer_T* lexer = calloc(1, sizeof(struct LEXER_STRUCT));
 
@@ -27,11 +29,11 @@ bool is_next_character_not_null(char character, int index, int contents_len) {
 
 int get_line_num(lexer_T* lexer) {
      int lineNumber = 1;
-     char target = lexer->current_char;
+     char* target = &lexer->contents[lexer->index];
      char* ptr = lexer->contents;  // Pointer to traverse the buffer
 
      while (*ptr != '\0') {  // Loop until the end of the string
-          if (*ptr == target) {
+          if (ptr == target) {
                return lineNumber;  // Return the line number when the pointer matches the target
           }
           if (*ptr == '\n') {
@@ -44,6 +46,7 @@ int get_line_num(lexer_T* lexer) {
 }
 
 char lexer_look_forward(lexer_T* lexer) {
+     lexer_skip_whitespace(lexer);
      if (is_next_character_not_null(lexer->contents[lexer->index + 1], lexer->index + 1, strlen(lexer->contents))) {
           return lexer->contents[(lexer->index+1)];
      }
@@ -105,6 +108,9 @@ token_T* lexer_get_next_token(lexer_T* lexer) {
                     break;
                case '*':
                     return lexer_read_forward_with_token(lexer, init_token(TOKEN_STAR, current_char_as_string, line), 1);
+                    break;
+               case ':':
+                    return lexer_read_forward_with_token(lexer, init_token(TOKEN_COLON, current_char_as_string, line), 1);
                     break;
                case ';':
                     return lexer_read_forward_with_token(lexer, init_token(TOKEN_SEMICOLON, current_char_as_string, line), 1);
@@ -284,7 +290,14 @@ token_T* lexer_parse_identifier(lexer_T* lexer) {
           }
      }
 
-     // TO-DO: check if variable expression start (like did with TOKEN_EXPRESSION_DOUBLE)
+     // check if variable expression start (like did with TOKEN_EXPRESSION_DOUBLE)
+     lexer_skip_whitespace(lexer);
+
+     for (int i = 0; i < (sizeof(expression_op) / sizeof(expression_op[0])); i++) {
+          if (strcmp(expression_op[i], lexer_get_current_char_as_string(lexer)) == 0) {
+               return init_token(TOKEN_EXPRESSION_IDENTIFIER, identifier, get_line_num(lexer));
+          }
+     }
 
      return init_token(TOKEN_ID, identifier, line_num);
 }

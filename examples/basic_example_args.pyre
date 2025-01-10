@@ -2,18 +2,18 @@ process int add(int a, int b){
      func(){
           paramsInBoundCheck();
           if (isParamInBound){
-               emit a+b;
+               emit c+d;
           }else {
            // do something else
           }
           
-          emit data1(a+a);
+          emit data1(e+f);
      }
 
      // you can have if/else statements like this
      // you can also exclude the yes/no and it the inside of the statement will be 'yes'
      helper boolean paramsInBoundCheck(){
-          if (a < 10 and is b < 5){
+          if (a < 10 and b < 5){
                emit isParamInBound(true);
           } else {
                emit isParamInBound(false);
