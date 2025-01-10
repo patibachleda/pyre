@@ -63,7 +63,7 @@ struct AST_NODE {
           struct AST_VARIABLE { char* name; } ast_variable;
           struct AST_BINARY { char* operator; ast_T* left; ast_T* right; } ast_binary;
 
-          struct AST_PROCESS_CALL { char* name; ast_T* args; ast_T** arguments;  } ast_process_call;
+          struct AST_PROCESS_CALL { char* name; ast_T* args; } ast_process_call;
           //struct AST_HELPER_CALL { char* name; ast_T** arguments; } ast_helper_call;
           struct AST_EMIT { ast_T* stmt; } ast_emit;
 

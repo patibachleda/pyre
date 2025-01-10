@@ -1,6 +1,6 @@
-process hi3(){
+process void hi3(){
      func(){
-          if( 2 == 2){
+          if(2 == 2){
                int c = 3;
           } else{
                int d = 2;
@@ -8,7 +8,7 @@ process hi3(){
           
      }
 
-     helper hi4(){
+     helper void hi4(){
           int d = 4;
           emit 4;
      }

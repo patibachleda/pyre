@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+char* expr_op[8] = { "+", "-", "/", "*", "<=", "<", ">=", ">" };
+
 parser_T* init_parser(lexer_T* lexer) {
      parser_T* parser = calloc(1, sizeof(struct PARSER_STRUCT));
 
@@ -78,7 +80,9 @@ ast_T* parser_parse_variable_definition(parser_T* parser, int type) {
      parser_move_forward(parser, TOKEN_ID);
      parser_move_forward(parser, TOKEN_EQUALS);
      node->token.ast_variable_definition.value = parser_parse_statement(parser);
-     parser_move_forward(parser, TOKEN_SEMICOLON);
+     if (parser->current_token->type == TOKEN_SEMICOLON) {
+          parser_move_forward(parser, TOKEN_SEMICOLON);
+     }
      node->numNodes = 0;
 
      return node;
@@ -97,6 +101,18 @@ void parser_move_forward(parser_T* parser, int token_type) {
           exit(1);
      }
 }
+
+// TO-DO: for process expressions
+//void parser_peek_forward(parser_T* parser, int token_type) {
+//     if (parser->current_token->type == token_type) {
+//          parser->prev_token = parser->current_token;
+//          parser->current_token = lexer_get_next_token(parser->lexer);
+//     }
+//     else {
+//          fprintf(stderr, "Unexpected token %s of type %d on line %d\n", parser->current_token->value, parser->current_token->type, parser->current_token->line);
+//          exit(1);
+//     }
+//}
 
 // --------------------------------------------------------------------------
 //                          LITERAL DEFINITIONS
@@ -148,9 +164,18 @@ ast_T* parser_parse_id(parser_T* parser) {
 
      // process call
      if (parser->current_token->type == TOKEN_LPAREN) {
+          ast_T* args = parser_parse_arguments_called(parser);
+
+          // TO-DO: for process expressions
+          //for (int i = 0; i < (sizeof(expr_op) / sizeof(expr_op[0])); i++) {
+          //     if (strcmp(expr_op[i], parser->current_token->value) == 0) {
+          //          return parser_parse_expression(parser);
+          //     }
+          //}
+
           node = init_ast(AST_PROCESS_CALL);
           node->token.ast_process_call.name = name;
-          node->token.ast_process_call.args = parser_parse_arguments_called(parser);
+          node->token.ast_process_call.args = args;
 
           if (parser->current_token->type == TOKEN_SEMICOLON) {
                parser_move_forward(parser, TOKEN_SEMICOLON);
@@ -503,21 +528,26 @@ ast_T* parser_parse_conditional(parser_T* parser) {
      }
 
      parser_move_forward(parser, TOKEN_RCURLY);
-     parser_move_forward(parser, TOKEN_ELSE);
-     parser_move_forward(parser, TOKEN_LCURLY);
 
-     //else body
-     num = 0;
+     // if has else
 
-     while (parser->current_token->type != TOKEN_RCURLY) {
-          ast_T* statement = parser_parse_statement(parser);
-          node->token.ast_conditional.else_stmts = realloc(node->token.ast_conditional.else_stmts, (num + 1) * sizeof(ast_T*));
-          node->token.ast_conditional.else_stmts[num] = statement;
-          num += 1;
+     if (parser->current_token->type == TOKEN_ELSE) {
+          parser_move_forward(parser, TOKEN_ELSE);
+          parser_move_forward(parser, TOKEN_LCURLY);
+
+          //else body
+          num = 0;
+
+          while (parser->current_token->type != TOKEN_RCURLY) {
+               ast_T* statement = parser_parse_statement(parser);
+               node->token.ast_conditional.else_stmts = realloc(node->token.ast_conditional.else_stmts, (num + 1) * sizeof(ast_T*));
+               node->token.ast_conditional.else_stmts[num] = statement;
+               num += 1;
+          }
+
+          parser_move_forward(parser, TOKEN_RCURLY);
      }
-
-     parser_move_forward(parser, TOKEN_RCURLY);
-
+     
      return node;
 }
 
@@ -530,3 +560,4 @@ ast_T* parser_parse_emit(parser_T* parser) {
      }
      return node;
 }
+

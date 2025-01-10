@@ -1,9 +1,9 @@
-process fibonacci(int n) {
-    int func() {
-        is (n <= 1) {  // Base case: if n is 0 or 1
+process void fibonacci(int n) {
+    func() {
+        if (n <= 1) {  // Base case: if n is 0 or 1
             emit result(n);  // Emit n as the result
         }
-        is (n > 1) {  // Recursive case: if n is greater than 1
+        if (n > 1) {  // Recursive case: if n is greater than 1
             emit result(fibonacci(n - 1) + fibonacci(n - 2));  // Emit the sum of the two preceding Fibonacci numbers
         }
     }
