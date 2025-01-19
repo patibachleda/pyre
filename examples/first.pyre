@@ -2,8 +2,10 @@ process void hi3(){
      func(){
           if(2 == 2){
                int c = 3;
+               print(c);
           } else{
                int d = 2;
+               print(d);
           }
           
      }
@@ -16,5 +18,5 @@ process void hi3(){
 
 
 main(){
-     hi3() -> hi4();
+     hi3();
 }

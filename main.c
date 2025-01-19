@@ -5,6 +5,7 @@
 #include "include/lexer.h"
 #include "include/parser.h"
 #include "include/token.h"
+#include "include/visitor.h"
 
 
 char* get_file_contents(const char* filepath)
@@ -224,26 +225,12 @@ int main(int argc, char* argv[]) {
                char* last_four = &argv[i][len - 5];
                if (strcmp(last_four, ".pyre") == 0) {
                     char* file = get_file_contents(argv[i]);
-                    lexer_T* lexer = init_lexer(file);
-
-                    //token_T* token = (void*)0;
-                    //while ((token = lexer_get_next_token(lexer)) != (void*)0) {
-                    //     printf("token %d %s %d \n", token->type, token->value, token->line);
-                    //}
-
-                    parser_T* parser = init_parser(lexer);
                     int list_size = 0;
+
+                    lexer_T* lexer = init_lexer(file);
+                    parser_T* parser = init_parser(lexer);
                     ast_T** list = parser_parse_statements(parser, &list_size);
-                    
-                    traverse_list(list, list_size);
-                
-                    free(file);
-                    free(lexer);
-                    free(parser);
-                    free(list);
-
-                    printf("complete");
-
+                    visitor_visit(list, list_size);
                }
                else {
                     printf("Usage: pyre <filename>\n");

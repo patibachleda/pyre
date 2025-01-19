@@ -127,7 +127,7 @@ ast_T* parser_parse_int(parser_T* parser) {
 
 ast_T* parser_parse_double(parser_T* parser) {
      ast_T* node = init_ast(AST_DOUBLE);
-     node->token.ast_double = atoi(parser->current_token->value);
+     node->token.ast_double = atof(parser->current_token->value);
      parser_move_forward(parser, TOKEN_DOUBLE);
 
      return node;
