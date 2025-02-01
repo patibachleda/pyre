@@ -13,6 +13,9 @@ parser_T* init_parser(lexer_T* lexer) {
           parser->current_token = lexer_get_next_token(lexer);
           parser->prev_token = parser->current_token;
      }
+
+     parser->scope = init_scope();
+
      return parser;
 }
 
@@ -20,7 +23,7 @@ ast_T** parser_parse_statements(parser_T* parser, int* ll_size) {
      ast_T** ll_nodes = calloc(1, sizeof(ast_T*));
      *ll_size = 0;
 
-     while (parser->current_token->type != TOKEN_RCURLY) { 
+     while (parser->current_token != NULL && parser->current_token->type != TOKEN_RCURLY) { 
           ast_T* statement = parser_parse_statement(parser);
           ll_nodes = realloc(ll_nodes, ((*ll_size+1) * sizeof(ast_T*)));
           ll_nodes[*ll_size] = statement;
@@ -177,7 +180,7 @@ ast_T* parser_parse_id(parser_T* parser) {
           node->token.ast_process_call.name = name;
           node->token.ast_process_call.args = args;
 
-          if (parser->current_token->type == TOKEN_SEMICOLON) {
+          if (parser->current_token != NULL && parser->current_token->type == TOKEN_SEMICOLON) {
                parser_move_forward(parser, TOKEN_SEMICOLON);
           }
      }
@@ -291,6 +294,7 @@ ast_T* parser_parse_helper_definition(parser_T* parser) {
 
      return helper_node;
 }
+
 
 ast_T* parser_parse_arguments_declared(parser_T* parser) {
      ast_T* node = init_ast(AST_ARG_LIST);
@@ -527,6 +531,7 @@ ast_T* parser_parse_conditional(parser_T* parser) {
           num += 1;
      }
 
+     node->token.ast_conditional.num_thens = num;
      parser_move_forward(parser, TOKEN_RCURLY);
 
      // if has else
@@ -545,6 +550,7 @@ ast_T* parser_parse_conditional(parser_T* parser) {
                num += 1;
           }
 
+          node->token.ast_conditional.num_elses = num;
           parser_move_forward(parser, TOKEN_RCURLY);
      }
      

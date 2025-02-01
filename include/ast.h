@@ -42,6 +42,8 @@ struct AST_NODE {
           AST_NOOP
      } type;
 
+     struct SCOPE_STRUCT* scope;
+
      union Token {
           struct AST_MAIN { ast_T** body; } ast_main;
           struct AST_PROCESS_DEFINITION { char* return_type; char* name; ast_T* args;  ast_T* func;  ast_T** helpers; } ast_process_definition;
@@ -54,7 +56,7 @@ struct AST_NODE {
           //struct AST_HELPER_CALL { char* name; ast_T** arguments; } ast_helper_call;
           struct AST_EMIT { ast_T* stmt; } ast_emit;
 
-          struct AST_CONDITIONAL { ast_T* condition; ast_T** then_stmts; ast_T** else_stmts; } ast_conditional; // !=, ==
+          struct AST_CONDITIONAL { ast_T* condition; ast_T** then_stmts; int num_thens; int num_elses; ast_T** else_stmts; } ast_conditional; // !=, ==
           
           // from crafting interpretters
           struct AST_EXPRESSION { ast_T* left; char* operator; ast_T* right; } ast_expression;
@@ -67,7 +69,7 @@ struct AST_NODE {
           struct AST_ARG_LIST { ast_T** args; } ast_arg_list;
           struct AST_NAMED_ARG { char* name; ast_T* expression; } ast_named_arg;
           struct AST_UNNAMED_ARG { ast_T* expression; } ast_unnamed_arg;
-          struct AST_DECLARED_ARG { char* type;  char* name;  } ast_declared_arg;
+          struct AST_DECLARED_ARG { char* type;  char* name; } ast_declared_arg;
 
           char* ast_string;
           char ast_character;
