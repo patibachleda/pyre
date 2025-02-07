@@ -1,0 +1,22 @@
+process void hi3(){
+     func(){
+          if(2 == 2){
+               int c = 3;
+               print(c);
+          } else{
+               int d = 2;
+               print(d);
+          }
+          
+     }
+
+     helper void hi4(){
+          int d = 4;
+          emit 4;
+     }
+}
+
+
+main(){
+     hi3();
+}

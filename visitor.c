@@ -20,7 +20,6 @@ ast_T* visitor_visit(ast_T* node) {
      if ( node == NULL) { return; }
 
      // Process the node based on its type
-     printf("type= %d \n", node->type);
      switch (node->type) {
           case AST_MAIN: visitor_visit_main(node);  break;
           case AST_PROCESS_DEFINITION:visitor_visit_process_definition(node); break;
@@ -42,18 +41,23 @@ ast_T* visitor_visit(ast_T* node) {
           case AST_UNARY: visitor_visit_unary(node);  break;
 
           case AST_ARG_LIST: visitor_visit_arg_list(node); break;
+          case AST_UNNAMED_ARG: visitor_visit_unnamed_arg(node); break;
 
           case AST_INT: printf("Processing AST_INT: %d\n", node->token.ast_int); break;
           case AST_DOUBLE: printf("Processing AST_DOUBLE: %f\n", node->token.ast_double); break;
           case AST_BOOLEAN: printf("Processing AST_BOOLEAN: %d\n", node->token.ast_boolean); break;
-          case AST_STRING: printf("Processing AST_STRING: %s\n", node->token.ast_string); break;
+          case AST_STRING: return node; break;
           case AST_CHARACTER: printf("Processing AST_CHARACTER: %c\n", node->token.ast_character); break;
           default: printf("Unknown node type %d \n", node->type); break;
      }
 }
 
 ast_T* visitor_visit_main(ast_T* node) {
-     visitor_visit(node->token.ast_main.body); // Recursively process the body
+     for (int i = 0; i < node->numNodes; i++) {
+          visitor_visit(node->token.ast_main.body[i]);
+     }
+
+     return init_ast(AST_NOOP);
 }
 
 ast_T* visitor_visit_process_definition(ast_T* node) {
@@ -93,8 +97,9 @@ ast_T* visitor_visit_variable(ast_T* node) {
           node->token.ast_variable.name
      );
 
-     if (vdef != (void*)0)
+     if (vdef != (void*)0) {
           return visitor_visit( vdef->token.ast_variable_definition.value);
+     }
 
      printf("Undefined variable `%s`\n", node->token.ast_variable.name);
      exit(1);
@@ -102,7 +107,7 @@ ast_T* visitor_visit_variable(ast_T* node) {
 
 ast_T* visitor_visit_process_call(ast_T* node) {
      if (strcmp(node->token.ast_process_call.name, "print") == 0) {
-          pyre_print(node->token.ast_process_call.args, node->token.ast_process_call.args->numNodes);
+          pyre_print(node->token.ast_process_call.args->token.ast_arg_list.args, node->token.ast_process_call.args->numNodes);
      }
 }
 
@@ -360,4 +365,9 @@ ast_T* visitor_visit_arg_list(ast_T* node) {
           }
      }
 
+}
+
+ast_T* visitor_visit_unnamed_arg(ast_T* node) {
+     ast_T* expr = node->token.ast_unnamed_arg.expression;
+     return visitor_visit(expr);
 }
