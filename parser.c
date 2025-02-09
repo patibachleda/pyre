@@ -88,6 +88,7 @@ ast_T* parser_parse_variable_definition(parser_T* parser, int type, scope_T* sco
           parser_move_forward(parser, TOKEN_SEMICOLON);
      }
      node->numNodes = 0;
+
      node->scope = scope;
 
      return node;
@@ -126,6 +127,7 @@ ast_T* parser_parse_int(parser_T* parser, scope_T* scope) {
      ast_T* node = init_ast(AST_INT);
      node->token.ast_int = atoi(parser->current_token->value);
      parser_move_forward(parser, TOKEN_INT);
+
      node->scope = scope;
 
      return node;
@@ -135,6 +137,7 @@ ast_T* parser_parse_double(parser_T* parser, scope_T* scope) {
      ast_T* node = init_ast(AST_DOUBLE);
      node->token.ast_double = atof(parser->current_token->value);
      parser_move_forward(parser, TOKEN_DOUBLE);
+
      node->scope = scope;
 
      return node;
@@ -144,6 +147,7 @@ ast_T* parser_parse_string(parser_T* parser, scope_T* scope) {
      ast_T* node = init_ast(AST_STRING);
      node->token.ast_string = parser->current_token->value;
      parser_move_forward(parser, TOKEN_STRING);
+
      node->scope = scope;
 
      return node;
@@ -153,6 +157,7 @@ ast_T* parser_parse_character(parser_T* parser, scope_T* scope) {
      ast_T* node = init_ast(AST_CHARACTER);
      node->token.ast_character = parser->current_token->value[0];
      parser_move_forward(parser, TOKEN_CHARACTER);
+
      node->scope = scope;
 
      return node;
@@ -162,6 +167,7 @@ ast_T* parser_parse_boolean(parser_T* parser, scope_T* scope) {
      ast_T* node = init_ast(AST_BOOLEAN);
      node->token.ast_boolean = (strcmp(parser->current_token->value, "true") == 0);
      parser_move_forward(parser, TOKEN_BOOLEAN);
+
      node->scope = scope;
 
      return node;
@@ -246,6 +252,8 @@ ast_T* parser_parse_process_definition(parser_T* parser, scope_T* scope) {
 
      parser_move_forward(parser, TOKEN_RCURLY);
 
+     process_node->scope = scope;
+
      return process_node;
 }
 
@@ -267,6 +275,8 @@ ast_T* parser_parse_func_definition(parser_T* parser, scope_T* scope) {
      }
 
      parser_move_forward(parser, TOKEN_RCURLY);
+
+     func_node->scope = scope;
 
      return func_node;
 }
@@ -300,6 +310,8 @@ ast_T* parser_parse_helper_definition(parser_T* parser, scope_T* scope) {
      }
 
      parser_move_forward(parser, TOKEN_RCURLY);
+
+     helper_node->scope = scope;
 
      return helper_node;
 }
@@ -352,11 +364,12 @@ ast_T* parser_parse_arguments_called(parser_T* parser, scope_T* scope) {
                parser_move_forward(parser, TOKEN_ID);
                parser_move_forward(parser, TOKEN_COLON);
                arg->token.ast_named_arg.expression = parser_parse_statement(parser, scope);
+               arg->scope = scope;
           }
           else { // if unnamed arg
                arg = init_ast(AST_UNNAMED_ARG);
                arg->token.ast_unnamed_arg.expression = parser_parse_statement(parser, scope);
-
+               arg->scope = scope;
           }
           node->token.ast_arg_list.args[num] = arg;
           num += 1;
@@ -433,6 +446,8 @@ ast_T* parser_parse_expression(parser_T* parser, scope_T* scope) {
           parser_move_forward(parser, TOKEN_SEMICOLON);
      }
 
+     node->scope = scope;
+
      return node;
 }
 
@@ -446,6 +461,8 @@ ast_T* parser_parse_equality(parser_T* parser, scope_T* scope) {
           parser_move_forward(parser, parser->current_token->type);
           node->token.ast_equality.right = parser_parse_comparison(parser, scope);
      }
+
+     node->scope = scope;
 
      return node;
 }
@@ -464,6 +481,8 @@ ast_T* parser_parse_comparison(parser_T* parser, scope_T* scope) {
           node->token.ast_comparison.right = parser_parse_term(parser, scope);
      }
 
+     node->scope = scope;
+
      return node;
 }
 
@@ -478,6 +497,8 @@ ast_T* parser_parse_term(parser_T* parser, scope_T* scope) {
           node->token.ast_term.right = parser_parse_factor(parser, scope);
      }
 
+     node->scope = scope;
+
      return node;
 }
 
@@ -491,6 +512,8 @@ ast_T* parser_parse_factor(parser_T* parser, scope_T* scope) {
           parser_move_forward(parser, parser->current_token->type);
           node->token.ast_term.right = parser_parse_unary(parser, scope);
      }
+
+     node->scope = scope;
 
      return node;
 }
@@ -517,6 +540,8 @@ ast_T* parser_parse_unary(parser_T* parser, scope_T* scope) {
      }
 
      node->token.ast_unary.stmt = parser_parse_statement(parser, scope);
+
+     node->scope = scope;
 
      return node;
 }
@@ -568,7 +593,9 @@ ast_T* parser_parse_conditional(parser_T* parser, scope_T* scope) {
           node->token.ast_conditional.num_elses = num;
           parser_move_forward(parser, TOKEN_RCURLY);
      }
-     
+
+     node->scope = scope;
+
      return node;
 }
 
@@ -579,6 +606,9 @@ ast_T* parser_parse_emit(parser_T* parser, scope_T* scope) {
      if (parser->current_token->type == TOKEN_SEMICOLON) {
           parser_move_forward(parser, TOKEN_SEMICOLON);
      }
+
+     node->scope = scope;
+
      return node;
 }
 

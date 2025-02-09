@@ -34,7 +34,7 @@ ast_T* scope_add_variable_definition(scope_T* scope, ast_T* vdef) {
      }
      else {
           scope->variable_definitions_size += 1;
-          scope->variable_definitions = realloc(scope->function_definitions, scope->variable_definitions_size * sizeof(struct AST_NODE*));
+          scope->variable_definitions = realloc(scope->variable_definitions, scope->variable_definitions_size * sizeof(struct AST_NODE*));
           scope->variable_definitions[scope->variable_definitions_size - 1] = vdef;
      }
 

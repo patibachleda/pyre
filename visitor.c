@@ -11,6 +11,7 @@ static pyre_print(ast_T** args, int args_size) {
           switch (visited_ast->type)
           {
                case AST_STRING: printf("%s\n", visited_ast->token.ast_string); break;
+               case AST_INT: printf("%d\n", visited_ast->token.ast_int); break;
                default: printf("%p\n", visited_ast); break;
           }
      }
@@ -43,11 +44,12 @@ ast_T* visitor_visit(ast_T* node) {
           case AST_ARG_LIST: visitor_visit_arg_list(node); break;
           case AST_UNNAMED_ARG: visitor_visit_unnamed_arg(node); break;
 
-          case AST_INT: printf("Processing AST_INT: %d\n", node->token.ast_int); break;
-          case AST_DOUBLE: printf("Processing AST_DOUBLE: %f\n", node->token.ast_double); break;
-          case AST_BOOLEAN: printf("Processing AST_BOOLEAN: %d\n", node->token.ast_boolean); break;
-          case AST_STRING: return node; break;
-          case AST_CHARACTER: printf("Processing AST_CHARACTER: %c\n", node->token.ast_character); break;
+          case AST_INT: 
+          case AST_DOUBLE:
+          case AST_BOOLEAN:
+          case AST_STRING: 
+          case AST_CHARACTER:
+               return node; break;
           default: printf("Unknown node type %d \n", node->type); break;
      }
 }
@@ -61,7 +63,7 @@ ast_T* visitor_visit_main(ast_T* node) {
 }
 
 ast_T* visitor_visit_process_definition(ast_T* node) {
-     visitor_visit(node->token.ast_process_definition.func->token.ast_func_definition.body);
+     visitor_visit(node->token.ast_process_definition.func);
 
      for (int i = 0; i < node->numNodes; i++) {
           visitor_visit(node->token.ast_process_definition.helpers[i]);
@@ -69,14 +71,15 @@ ast_T* visitor_visit_process_definition(ast_T* node) {
 }
 
 ast_T* visitor_visit_func_definition(ast_T* node) {
-
+     for (int i = 0; i < node->numNodes; i++) {
+          visitor_visit(node->token.ast_func_definition.body[i]);
+     }
 }
 
 ast_T* visitor_visit_helper_definition(ast_T* node) {
      for (int i = 0; i < node->numNodes; i++) {
           visitor_visit(node->token.ast_helper_definition.body[i]);
      }
-
 }
 
 ast_T* visitor_visit_variable_definition(ast_T* node) {
@@ -109,6 +112,19 @@ ast_T* visitor_visit_process_call(ast_T* node) {
      if (strcmp(node->token.ast_process_call.name, "print") == 0) {
           pyre_print(node->token.ast_process_call.args->token.ast_arg_list.args, node->token.ast_process_call.args->numNodes);
      }
+
+     ast_T* vdef = scope_get_function_definition(
+          node->scope,
+          node->token.ast_helper_definition.name
+     );
+
+     if (vdef != (void*)0) {
+          return visitor_visit(vdef->token.ast_variable_definition.value);
+     }
+
+     printf("Undefined variable `%s`\n", node->token.ast_variable.name);
+     exit(1);
+
 }
 
 ast_T* visitor_visit_emit(ast_T* node) {
@@ -118,7 +134,7 @@ ast_T* visitor_visit_emit(ast_T* node) {
 
 ast_T* visitor_visit_conditional(ast_T* node) {
      ast_T* stmt[1] = { node->token.ast_conditional.condition };
-     visitor_visit(stmt);
+     ast_T* final = visitor_visit(stmt[0]);
 
      for (int i = 0; i < node->token.ast_conditional.num_thens; i++) {
           visitor_visit(node->token.ast_conditional.then_stmts[i]);
@@ -133,10 +149,26 @@ ast_T* visitor_visit_expression(ast_T* node) {
      if (node->token.ast_expression.operator != NULL) {
           ast_T* eval_left = visitor_visit(node->token.ast_term.left);
           ast_T* eval_right = visitor_visit(node->token.ast_term.right);
-          if (strcmp(node->token.ast_term.operator, "==") == 0) {
+          if (strcmp(node->token.ast_term.operator, "and") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
                     node->token.ast_term.left->type = AST_BOOLEAN;
                     node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_int && visitor_visit(node->token.ast_term.right)->token.ast_int;
+                    return node;
+               }
+               else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
+                    node->token.ast_term.left->type = AST_BOOLEAN;
+                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_double && visitor_visit(node->token.ast_term.right)->token.ast_double;
+                    return node;
+               }
+               else {
+                    printf("Types do not match so they cannot be used in an expression");
+                    exit(3);
+               }
+          }
+          else if (strcmp(node->token.ast_term.operator, "or") == 0) {
+               if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
+                    node->token.ast_term.left->type = AST_BOOLEAN;
+                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_int || visitor_visit(node->token.ast_term.right)->token.ast_int;
                     return node;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
@@ -149,81 +181,24 @@ ast_T* visitor_visit_expression(ast_T* node) {
                     exit(3);
                }
           }
-          else if (strcmp(node->token.ast_term.operator, "!=") == 0) {
-               if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_term.left->type = AST_BOOLEAN;
-                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_int != visitor_visit(node->token.ast_term.right)->token.ast_int;
-                    return node;
-               }
-               else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_term.left->type = AST_BOOLEAN;
-                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_double != visitor_visit(node->token.ast_term.right)->token.ast_double;
-                    return node;
-               }
-               else {
-                    printf("Types do not match so they cannot be used in an expression");
-                    exit(3);
-               }
-          }
-     }
-
-     return visitor_visit(node->token.ast_term.left, 1);
-}
-
-ast_T* visitor_visit_equality(ast_T* node) {
-     if (node->token.ast_expression.operator != NULL) {
-          ast_T* eval_left = visitor_visit(node->token.ast_term.left);
-          ast_T* eval_right = visitor_visit(node->token.ast_term.right);
-          if (strcmp(node->token.ast_term.operator, "and") == 0) {
-               if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_term.left->type = AST_BOOLEAN;
-                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_int == visitor_visit(node->token.ast_term.right)->token.ast_int;
-                    return node;
-               }
-               else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_term.left->type = AST_BOOLEAN;
-                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_double == visitor_visit(node->token.ast_term.right)->token.ast_double;
-                    return node;
-               }
-               else {
-                    printf("Types do not match so they cannot be used in an expression");
-                    exit(3);
-               }
-          }
-          else if (strcmp(node->token.ast_term.operator, "or") == 0) {
-               if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_term.left->type = AST_BOOLEAN;
-                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_int != visitor_visit(node->token.ast_term.right)->token.ast_int;
-                    return node;
-               }
-               else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_term.left->type = AST_BOOLEAN;
-                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_double != visitor_visit(node->token.ast_term.right)->token.ast_double;
-                    return node;
-               }
-               else {
-                    printf("Types do not match so they cannot be used in an expression");
-                    exit(3);
-               }
-          }
      }
 
      return visitor_visit(node->token.ast_term.left);
 }
 
-ast_T* visitor_visit_comparison(ast_T* node) {
-     if (node->token.ast_expression.operator != NULL) {
-          ast_T* eval_left = visitor_visit(node->token.ast_term.left);
-          ast_T* eval_right = visitor_visit(node->token.ast_term.right);
-          if (strcmp(node->token.ast_term.operator, "==") == 0) {
+ast_T* visitor_visit_equality(ast_T* node) {
+     if (node->token.ast_equality.operator != NULL) {
+          ast_T* eval_left = visitor_visit(node->token.ast_equality.left);
+          ast_T* eval_right = visitor_visit(node->token.ast_equality.right);
+          if (strcmp(node->token.ast_equality.operator, "and") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_term.left->type = AST_BOOLEAN;
-                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_int == visitor_visit(node->token.ast_term.right)->token.ast_int;
+                    node->token.ast_equality.left->type = AST_BOOLEAN;
+                    node->token.ast_equality.left->token.ast_boolean = visitor_visit(node->token.ast_equality.left)->token.ast_int == visitor_visit(node->token.ast_equality.right)->token.ast_int;
                     return node;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_term.left->type = AST_BOOLEAN;
-                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_double == visitor_visit(node->token.ast_term.right)->token.ast_double;
+                    node->token.ast_equality.left->type = AST_BOOLEAN;
+                    node->token.ast_equality.left->token.ast_boolean = visitor_visit(node->token.ast_equality.left)->token.ast_double == visitor_visit(node->token.ast_equality.right)->token.ast_double;
                     return node;
                }
                else {
@@ -231,15 +206,15 @@ ast_T* visitor_visit_comparison(ast_T* node) {
                     exit(3);
                }
           }
-          else if (strcmp(node->token.ast_term.operator, "!=") == 0) {
+          else if (strcmp(node->token.ast_equality.operator, "or") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_term.left->type = AST_BOOLEAN;
-                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_int != visitor_visit(node->token.ast_term.right)->token.ast_int;
+                    node->token.ast_equality.left->type = AST_BOOLEAN;
+                    node->token.ast_equality.left->token.ast_boolean = visitor_visit(node->token.ast_equality.left)->token.ast_int != visitor_visit(node->token.ast_equality.right)->token.ast_int;
                     return node;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
                     node->token.ast_term.left->type = AST_BOOLEAN;
-                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_term.left)->token.ast_double != visitor_visit(node->token.ast_term.right)->token.ast_double;
+                    node->token.ast_term.left->token.ast_boolean = visitor_visit(node->token.ast_equality.left)->token.ast_double != visitor_visit(node->token.ast_equality.right)->token.ast_double;
                     return node;
                }
                else {
@@ -249,11 +224,52 @@ ast_T* visitor_visit_comparison(ast_T* node) {
           }
      }
 
-     return visitor_visit(node->token.ast_term.left, 1);
+     return visitor_visit(node->token.ast_equality.left);
+}
+
+ast_T* visitor_visit_comparison(ast_T* node) {
+     if (node->token.ast_comparison.operator != NULL) {
+          ast_T* eval_left = visitor_visit(node->token.ast_comparison.left);
+          ast_T* eval_right = visitor_visit(node->token.ast_comparison.right);
+          if (strcmp(node->token.ast_comparison.operator, "==") == 0) {
+               if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
+                    node->token.ast_comparison.left->type = AST_BOOLEAN;
+                    node->token.ast_comparison.left->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_int == visitor_visit(node->token.ast_comparison.right)->token.ast_int;
+                    return node;
+               }
+               else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
+                    node->token.ast_comparison.left->type = AST_BOOLEAN;
+                    node->token.ast_comparison.left->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_double == visitor_visit(node->token.ast_comparison.right)->token.ast_double;
+                    return node;
+               }
+               else {
+                    printf("Types do not match so they cannot be used in an expression");
+                    exit(3);
+               }
+          }
+          else if (strcmp(node->token.ast_comparison.operator, "!=") == 0) {
+               if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
+                    node->token.ast_comparison.left->type = AST_BOOLEAN;
+                    node->token.ast_comparison.left->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_int != visitor_visit(node->token.ast_comparison.right)->token.ast_int;
+                    return node;
+               }
+               else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
+                    node->token.ast_comparison.left->type = AST_BOOLEAN;
+                    node->token.ast_comparison.left->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_double != visitor_visit(node->token.ast_comparison.right)->token.ast_double;
+                    return node;
+               }
+               else {
+                    printf("Types do not match so they cannot be used in an expression");
+                    exit(3);
+               }
+          }
+     }
+
+     return visitor_visit(node->token.ast_comparison.left, 1);
 }
 
 ast_T* visitor_visit_term(ast_T* node) {
-     if (node->token.ast_expression.operator != NULL) {
+     if (node->token.ast_term.operator != NULL) {
           ast_T* eval_left = visitor_visit(node->token.ast_term.left, 1);
           ast_T* eval_right = visitor_visit(node->token.ast_term.right, 1);
           if (strcmp(node->token.ast_term.operator, "+") == 0) {
@@ -294,18 +310,18 @@ ast_T* visitor_visit_term(ast_T* node) {
 }
 
 ast_T* visitor_visit_factor(ast_T* node) {
-     if (node->token.ast_expression.operator != NULL) {
-          ast_T* eval_left = visitor_visit(node->token.ast_term.left, 1);
-          ast_T* eval_right = visitor_visit(node->token.ast_term.right, 1);
-          if (strcmp(node->token.ast_term.operator, "*") == 0) {
+     if (node->token.ast_factor.operator != NULL) {
+          ast_T* eval_left = visitor_visit(node->token.ast_factor.left, 1);
+          ast_T* eval_right = visitor_visit(node->token.ast_factor.right, 1);
+          if (strcmp(node->token.ast_factor.operator, "*") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_term.left->type = AST_INT;
-                    node->token.ast_term.left->token.ast_int = visitor_visit(node->token.ast_term.left)->token.ast_int * visitor_visit(node->token.ast_term.right)->token.ast_int;
+                    node->token.ast_factor.left->type = AST_INT;
+                    node->token.ast_factor.left->token.ast_int = visitor_visit(node->token.ast_factor.left)->token.ast_int * visitor_visit(node->token.ast_factor.right)->token.ast_int;
                     return node;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_term.left->type = AST_DOUBLE;
-                    node->token.ast_term.left->token.ast_double = visitor_visit(node->token.ast_term.left)->token.ast_double * visitor_visit(node->token.ast_term.right)->token.ast_double;
+                    node->token.ast_factor.left->type = AST_DOUBLE;
+                    node->token.ast_factor.left->token.ast_double = visitor_visit(node->token.ast_factor.left)->token.ast_double * visitor_visit(node->token.ast_factor.right)->token.ast_double;
                     return node;
                }
                else {
@@ -313,15 +329,15 @@ ast_T* visitor_visit_factor(ast_T* node) {
                     exit(3);
                }
           }
-          else if (strcmp(node->token.ast_term.operator, "/") == 0) {
+          else if (strcmp(node->token.ast_factor.operator, "/") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_term.left->type = AST_INT;
-                    node->token.ast_term.left->token.ast_int = visitor_visit(node->token.ast_term.left)->token.ast_int / visitor_visit(node->token.ast_term.right)->token.ast_int;
+                    node->token.ast_factor.left->type = AST_INT;
+                    node->token.ast_factor.left->token.ast_int = visitor_visit(node->token.ast_factor.left)->token.ast_int / visitor_visit(node->token.ast_factor.right)->token.ast_int;
                     return node;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_term.left->type = AST_DOUBLE;
-                    node->token.ast_term.left->token.ast_double = visitor_visit(node->token.ast_term.left)->token.ast_double / visitor_visit(node->token.ast_term.right)->token.ast_double;
+                    node->token.ast_factor.left->type = AST_DOUBLE;
+                    node->token.ast_factor.left->token.ast_double = visitor_visit(node->token.ast_factor.left)->token.ast_double / visitor_visit(node->token.ast_factor.right)->token.ast_double;
                     return node;
                }
                else {
@@ -331,20 +347,17 @@ ast_T* visitor_visit_factor(ast_T* node) {
           }
      }
 
-     return visitor_visit(node->token.ast_term.left);
+     return visitor_visit(node->token.ast_factor.left);
 }
 
 ast_T* visitor_visit_unary(ast_T* node) {
      if (node->token.ast_unary.operator != NULL) {
-          if (strcmp(node->token.ast_term.operator, "!") == 0) {
-
-          }
-          else {
+          if (strcmp(node->token.ast_unary.operator, "!") == 0) {
 
           }
      }
      ast_T* stmt[1] = { node->token.ast_unary.stmt };
-     visitor_visit(stmt, 1); // Recursively process the body
+     visitor_visit(stmt[0]); // Recursively process the body
 }
 
 ast_T* visitor_visit_arg_list(ast_T* node) {

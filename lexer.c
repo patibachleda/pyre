@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
-char* expression_op[8] = { "+", "-", "/", "*", "<=", "<", ">=", ">" };
+char* expression_op[10] = { "+", "-", "/", "*", "<=", "<", ">=", ">", "=", "!"};
 
 lexer_T* init_lexer(char* contents) {
      lexer_T* lexer = calloc(1, sizeof(struct LEXER_STRUCT));
@@ -294,7 +294,7 @@ token_T* lexer_parse_identifier(lexer_T* lexer) {
      lexer_skip_whitespace(lexer);
 
      for (int i = 0; i < (sizeof(expression_op) / sizeof(expression_op[0])); i++) {
-          if (strcmp(expression_op[i], lexer_get_current_char_as_string(lexer)) == 0) {
+          if (strcmp(expression_op[i], lexer_get_next_char_as_string(lexer)) == 0) {
                return init_token(TOKEN_EXPRESSION_IDENTIFIER, identifier, get_line_num(lexer));
           }
      }
@@ -312,6 +312,7 @@ char* lexer_get_current_char_as_string(lexer_T* lexer) {
 
      return current_char_as_string;
 }
+
 
 char* lexer_get_next_char_as_string(lexer_T* lexer) {
      char* current_char_as_string = calloc(2, sizeof(char));
