@@ -46,7 +46,10 @@ int main(int argc, char* argv[]) {
                     lexer_T* lexer = init_lexer(file);
                     parser_T* parser = init_parser(lexer);
                     ast_T** list = parser_parse_statements(parser, &list_size);
-                    visitor_visit(list[0]);
+
+                    for (int i = 0; i < list_size; i++) {
+                         visitor_visit(list[i]);
+                    }
                }
                else {
                     printf("Usage: pyre <filename>\n");

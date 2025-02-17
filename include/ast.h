@@ -42,7 +42,8 @@ struct AST_NODE {
           AST_NOOP
      } type;
 
-     struct SCOPE_STRUCT* scope;
+     struct SCOPE_STRUCT* local_scope;
+     struct SCOPE_STRUCT* global_scope;
 
      union Token {
           struct AST_MAIN { ast_T** body; } ast_main;

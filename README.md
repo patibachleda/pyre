@@ -15,8 +15,8 @@ in the order you specify through through an arrow notation.
 Each process has a return type and can take in arguments. Each process has it's own "main()" function, named func(). The func()
 of each process is where the execution of logic happens. Each process may have 0 or more helper methods that can be used inside the func() function.
 
-The helper functions can "emit" a value. This value 's scope will inside the func() function.
-The func() function can "emit" a value as well. However, This value's scope will inside the main() function.
+The helper functions can "emit" a value. This value 's local_scope will inside the func() function.
+The func() function can "emit" a value as well. However, This value's local_scope will inside the main() function.
 You can define the name of the emitted value by following the syntax emit \<name\>(\<value\>);
 
 #### Grammar
