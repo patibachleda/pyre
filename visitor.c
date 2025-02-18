@@ -11,7 +11,10 @@ static pyre_print(ast_T** args, int args_size) {
           switch (visited_ast->type)
           {
                case AST_STRING: printf("%s\n", visited_ast->token.ast_string); break;
+               case AST_CHARACTER: printf("%c\n", visited_ast->token.ast_character); break;
                case AST_INT: printf("%d\n", visited_ast->token.ast_int); break;
+               case AST_DOUBLE: printf("%f\n", visited_ast->token.ast_double); break;
+               case AST_BOOLEAN: printf("%d\n", visited_ast->token.ast_boolean); break;
                default: printf("%p\n", visited_ast); break;
           }
      }
@@ -71,7 +74,7 @@ ast_T* visitor_visit_process_definition(ast_T* node) {
      // add helpers
      for (int i = 0; i < node->numNodes; i++) {
           scope_add_function_definition(
-               node->token.ast_process_definition.helpers[i]->local_scope,
+               node->token.ast_process_definition.helpers[i]->process_scope,
                node->token.ast_process_definition.helpers[i]
           );
      }
@@ -81,7 +84,7 @@ ast_T* visitor_visit_process_definition(ast_T* node) {
 
 ast_T* visitor_visit_func_definition(ast_T* node) {
      scope_add_function_definition(
-          node->local_scope,
+          node->process_scope,
           node
      );
 
@@ -90,14 +93,11 @@ ast_T* visitor_visit_func_definition(ast_T* node) {
 
 ast_T* visitor_visit_helper_definition(ast_T* node) {
      scope_add_function_definition(
-          node->local_scope,
+          node->process_scope,
           node
      );
 
      return node;
-     //for (int i = 0; i < node->numNodes; i++) {
-     //     visitor_visit(node->token.ast_helper_definition.body[i]);
-     //}
 }
 
 ast_T* visitor_visit_variable_definition(ast_T* node) {
@@ -105,9 +105,6 @@ ast_T* visitor_visit_variable_definition(ast_T* node) {
           node->local_scope,
           node
      );
-
-     //ast_T* stmt[1] = { node->token.ast_variable_definition.value };
-//visitor_visit(stmt, 1);
 
      return node;
 }
@@ -134,7 +131,7 @@ ast_T* visitor_visit_process_call(ast_T* node) {
 
      ast_T* pdef = scope_get_process_definition(
           node->global_scope,
-          node->local_scope,
+          node->process_scope,
           node->token.ast_process_call.name
      );
 
@@ -418,7 +415,7 @@ ast_T* visitor_visit_factor(ast_T* node) {
                     return node;
                }
                else {
-                    printf("Cannot divide types other than int and double on line");
+                    printf("%d: Cannot divide types other than int and double on line", node);
                     exit(3);
                }
           }

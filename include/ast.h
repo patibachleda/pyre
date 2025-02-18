@@ -44,6 +44,7 @@ struct AST_NODE {
 
      struct SCOPE_STRUCT* local_scope;
      struct SCOPE_STRUCT* global_scope;
+     struct SCOPE_STRUCT* process_scope;
 
      union Token {
           struct AST_MAIN { ast_T** body; } ast_main;

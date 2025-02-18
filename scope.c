@@ -108,8 +108,14 @@ ast_T* scope_add_variable_definition(scope_T* scope, ast_T* vdef) {
 
           if (strcmp(temp->token.ast_variable_definition.name, vdef->token.ast_variable_definition.name) == 0)
           {
-               printf("Variable already declared %s\n", vdef->token.ast_variable_definition.name);
-               exit(1);
+               temp->token.ast_variable_definition.value = vdef->token.ast_variable_definition.value;
+               //if (temp->token.ast_variable_definition.value->type == AST_PROCESS_CALL) {
+               //     temp->token.ast_variable_definition.value = vdef->token.ast_variable_definition.value;
+               //}
+               //else {
+               //     printf("Variable already declared %s\n", vdef->token.ast_variable_definition.name);
+               //     exit(1);
+               //}
           }
      }
     
