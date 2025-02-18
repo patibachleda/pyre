@@ -10,14 +10,16 @@ static pyre_print(ast_T** args, int args_size) {
           ast_T* visited_ast = visitor_visit(args[i]);
           switch (visited_ast->type)
           {
-               case AST_STRING: printf("%s\n", visited_ast->token.ast_string); break;
-               case AST_CHARACTER: printf("%c\n", visited_ast->token.ast_character); break;
-               case AST_INT: printf("%d\n", visited_ast->token.ast_int); break;
-               case AST_DOUBLE: printf("%f\n", visited_ast->token.ast_double); break;
-               case AST_BOOLEAN: printf("%d\n", visited_ast->token.ast_boolean); break;
-               default: printf("%p\n", visited_ast); break;
+               case AST_STRING: printf("%s ", visited_ast->token.ast_string); break;
+               case AST_CHARACTER: printf("%c ", visited_ast->token.ast_character); break;
+               case AST_INT: printf("%d ", visited_ast->token.ast_int); break;
+               case AST_DOUBLE: printf("%f ", visited_ast->token.ast_double); break;
+               case AST_BOOLEAN: printf("%d ", visited_ast->token.ast_boolean); break;
+               default: printf("%p ", visited_ast); break;
           }
      }
+
+     printf("\n");
 }
 
 ast_T* visitor_visit(ast_T* node) {
@@ -196,6 +198,11 @@ ast_T* visitor_visit_expression(ast_T* node) {
                     ret_val->token.ast_boolean = visitor_visit(node->token.ast_expression.left)->token.ast_int && visitor_visit(node->token.ast_expression.right)->token.ast_int;
                     return ret_val;
                }
+               else if (eval_left->type == AST_BOOLEAN && eval_right->type == AST_BOOLEAN) {
+                    ast_T* ret_val = init_ast(AST_BOOLEAN);
+                    ret_val->token.ast_boolean = visitor_visit(node->token.ast_equality.left)->token.ast_boolean == visitor_visit(node->token.ast_equality.right)->token.ast_boolean;
+                    return ret_val;
+               }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
                     ast_T* ret_val = init_ast(AST_BOOLEAN);
                     ret_val->token.ast_boolean = visitor_visit(node->token.ast_expression.left)->token.ast_double && visitor_visit(node->token.ast_expression.right)->token.ast_double;
@@ -215,6 +222,11 @@ ast_T* visitor_visit_expression(ast_T* node) {
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
                     ast_T* ret_val = init_ast(AST_BOOLEAN);
                     ret_val->token.ast_boolean = visitor_visit(node->token.ast_expression.left)->token.ast_double || visitor_visit(node->token.ast_expression.right)->token.ast_double;
+                    return ret_val;
+               }
+               else if (eval_left->type == AST_BOOLEAN && eval_right->type == AST_BOOLEAN) {
+                    ast_T* ret_val = init_ast(AST_BOOLEAN);
+                    ret_val->token.ast_boolean = visitor_visit(node->token.ast_equality.left)->token.ast_boolean == visitor_visit(node->token.ast_equality.right)->token.ast_boolean;
                     return ret_val;
                }
                else {
@@ -243,6 +255,11 @@ ast_T* visitor_visit_equality(ast_T* node) {
                     ret_val->token.ast_boolean = visitor_visit(node->token.ast_equality.left)->token.ast_double == visitor_visit(node->token.ast_equality.right)->token.ast_double;
                     return ret_val;
                }
+               else if (eval_left->type == AST_BOOLEAN && eval_right->type == AST_BOOLEAN) {
+                    ast_T* ret_val = init_ast(AST_BOOLEAN);
+                    ret_val->token.ast_boolean = visitor_visit(node->token.ast_equality.left)->token.ast_boolean == visitor_visit(node->token.ast_equality.right)->token.ast_boolean;
+                    return ret_val;
+               }
                else {
                     printf("Types do not match so they cannot be used in an equality");
                     exit(3);
@@ -257,6 +274,11 @@ ast_T* visitor_visit_equality(ast_T* node) {
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
                     ast_T* ret_val = init_ast(AST_BOOLEAN);
                     ret_val->token.ast_boolean = visitor_visit(node->token.ast_equality.left)->token.ast_double != visitor_visit(node->token.ast_equality.right)->token.ast_double;
+                    return ret_val;
+               }
+               else if (eval_left->type == AST_BOOLEAN && eval_right->type == AST_BOOLEAN) {
+                    ast_T* ret_val = init_ast(AST_BOOLEAN);
+                    ret_val->token.ast_boolean = visitor_visit(node->token.ast_equality.left)->token.ast_boolean != visitor_visit(node->token.ast_equality.right)->token.ast_boolean;
                     return ret_val;
                }
                else {
@@ -275,14 +297,14 @@ ast_T* visitor_visit_comparison(ast_T* node) {
           ast_T* eval_right = visitor_visit(node->token.ast_comparison.right);
           if (strcmp(node->token.ast_comparison.operator, ">=") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_comparison.left->type = AST_BOOLEAN;
-                    node->token.ast_comparison.left->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_int >= visitor_visit(node->token.ast_comparison.right)->token.ast_int;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_BOOLEAN);
+                    ret_val->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_int >= visitor_visit(node->token.ast_comparison.right)->token.ast_int;
+                    return ret_val;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_comparison.left->type = AST_BOOLEAN;
-                    node->token.ast_comparison.left->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_double >= visitor_visit(node->token.ast_comparison.right)->token.ast_double;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_BOOLEAN);
+                    ret_val->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_double >= visitor_visit(node->token.ast_comparison.right)->token.ast_double;
+                    return ret_val;
                }
                else {
                     printf("Types do not match so they cannot be used in an comparison");
@@ -291,14 +313,14 @@ ast_T* visitor_visit_comparison(ast_T* node) {
           }
           else if (strcmp(node->token.ast_comparison.operator, ">") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_comparison.left->type = AST_BOOLEAN;
-                    node->token.ast_comparison.left->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_int > visitor_visit(node->token.ast_comparison.right)->token.ast_int;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_BOOLEAN);
+                    ret_val->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_int > visitor_visit(node->token.ast_comparison.right)->token.ast_int;
+                    return ret_val;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_comparison.left->type = AST_BOOLEAN;
-                    node->token.ast_comparison.left->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_double > visitor_visit(node->token.ast_comparison.right)->token.ast_double;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_BOOLEAN);
+                    ret_val->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_double > visitor_visit(node->token.ast_comparison.right)->token.ast_double;
+                    return ret_val;
                }
                else {
                     printf("Types do not match so they cannot be used in an comparison");
@@ -307,14 +329,14 @@ ast_T* visitor_visit_comparison(ast_T* node) {
           }
           else if (strcmp(node->token.ast_comparison.operator, "<=") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_comparison.left->type = AST_BOOLEAN;
-                    node->token.ast_comparison.left->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_int <= visitor_visit(node->token.ast_comparison.right)->token.ast_int;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_BOOLEAN);
+                    ret_val->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_int <= visitor_visit(node->token.ast_comparison.right)->token.ast_int;
+                    return ret_val;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_comparison.left->type = AST_BOOLEAN;
-                    node->token.ast_comparison.left->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_double <= visitor_visit(node->token.ast_comparison.right)->token.ast_double;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_BOOLEAN);
+                    ret_val->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_double <= visitor_visit(node->token.ast_comparison.right)->token.ast_double;
+                    return ret_val;
                }
                else {
                     printf("Types do not match so they cannot be used in an comparison");
@@ -323,14 +345,14 @@ ast_T* visitor_visit_comparison(ast_T* node) {
           }
           else if (strcmp(node->token.ast_comparison.operator, "<") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_comparison.left->type = AST_BOOLEAN;
-                    node->token.ast_comparison.left->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_int < visitor_visit(node->token.ast_comparison.right)->token.ast_int;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_BOOLEAN);
+                    ret_val->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_int < visitor_visit(node->token.ast_comparison.right)->token.ast_int;
+                    return ret_val;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_comparison.left->type = AST_BOOLEAN;
-                    node->token.ast_comparison.left->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_double < visitor_visit(node->token.ast_comparison.right)->token.ast_double;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_BOOLEAN);
+                    ret_val->token.ast_boolean = visitor_visit(node->token.ast_comparison.left)->token.ast_double < visitor_visit(node->token.ast_comparison.right)->token.ast_double;
+                    return ret_val;
                }
                else {
                     printf("Types do not match so they cannot be used in an comparison");
@@ -348,14 +370,14 @@ ast_T* visitor_visit_term(ast_T* node) {
           ast_T* eval_right = visitor_visit(node->token.ast_term.right, 1);
           if (strcmp(node->token.ast_term.operator, "+") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_term.left->type = AST_INT;
-                    node->token.ast_term.left->token.ast_int = visitor_visit(node->token.ast_term.left)->token.ast_int + visitor_visit(node->token.ast_term.right)->token.ast_int;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_INT);
+                    ret_val->token.ast_int = visitor_visit(node->token.ast_term.left)->token.ast_int + visitor_visit(node->token.ast_term.right)->token.ast_int;
+                    return ret_val;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_term.left->type = AST_DOUBLE;
-                    node->token.ast_term.left->token.ast_double = visitor_visit(node->token.ast_term.left)->token.ast_double + visitor_visit(node->token.ast_term.right)->token.ast_double;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_DOUBLE);
+                    ret_val->token.ast_double = visitor_visit(node->token.ast_term.left)->token.ast_double + visitor_visit(node->token.ast_term.right)->token.ast_double;
+                    return ret_val;
                }
                else {
                     printf("Cannot add types other than int and double on line");
@@ -364,14 +386,14 @@ ast_T* visitor_visit_term(ast_T* node) {
           }
           else if (strcmp(node->token.ast_term.operator, "-") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_term.left->type = AST_INT;
-                    node->token.ast_term.left->token.ast_int = visitor_visit(node->token.ast_term.left)->token.ast_int - visitor_visit(node->token.ast_term.right)->token.ast_int;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_INT);
+                    ret_val->token.ast_int = visitor_visit(node->token.ast_term.left)->token.ast_int - visitor_visit(node->token.ast_term.right)->token.ast_int;
+                    return ret_val;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_term.left->type = AST_DOUBLE;
-                    node->token.ast_term.left->token.ast_double = visitor_visit(node->token.ast_term.left)->token.ast_double - visitor_visit(node->token.ast_term.right)->token.ast_double;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_DOUBLE);
+                    ret_val->token.ast_double = visitor_visit(node->token.ast_term.left)->token.ast_double - visitor_visit(node->token.ast_term.right)->token.ast_double;
+                    return ret_val;
                }
                else {
                     printf("Cannot subtract types other than int and double on line");
@@ -389,14 +411,14 @@ ast_T* visitor_visit_factor(ast_T* node) {
           ast_T* eval_right = visitor_visit(node->token.ast_factor.right, 1);
           if (strcmp(node->token.ast_factor.operator, "*") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_factor.left->type = AST_INT;
-                    node->token.ast_factor.left->token.ast_int = visitor_visit(node->token.ast_factor.left)->token.ast_int * visitor_visit(node->token.ast_factor.right)->token.ast_int;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_INT);
+                    ret_val->token.ast_int = visitor_visit(node->token.ast_factor.left)->token.ast_int * visitor_visit(node->token.ast_factor.right)->token.ast_int;
+                    return ret_val;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_factor.left->type = AST_DOUBLE;
-                    node->token.ast_factor.left->token.ast_double = visitor_visit(node->token.ast_factor.left)->token.ast_double * visitor_visit(node->token.ast_factor.right)->token.ast_double;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_DOUBLE);
+                    ret_val->token.ast_double = visitor_visit(node->token.ast_factor.left)->token.ast_double * visitor_visit(node->token.ast_factor.right)->token.ast_double;
+                    return ret_val;
                }
                else {
                     printf("Cannot multiple types other than int and double on line");
@@ -405,14 +427,14 @@ ast_T* visitor_visit_factor(ast_T* node) {
           }
           else if (strcmp(node->token.ast_factor.operator, "/") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
-                    node->token.ast_factor.left->type = AST_INT;
-                    node->token.ast_factor.left->token.ast_int = visitor_visit(node->token.ast_factor.left)->token.ast_int / visitor_visit(node->token.ast_factor.right)->token.ast_int;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_INT);
+                    ret_val->token.ast_int = visitor_visit(node->token.ast_factor.left)->token.ast_int / visitor_visit(node->token.ast_factor.right)->token.ast_int;
+                    return ret_val;
                }
                else if (eval_left->type == AST_DOUBLE && eval_right->type == AST_DOUBLE) {
-                    node->token.ast_factor.left->type = AST_DOUBLE;
-                    node->token.ast_factor.left->token.ast_double = visitor_visit(node->token.ast_factor.left)->token.ast_double / visitor_visit(node->token.ast_factor.right)->token.ast_double;
-                    return node;
+                    ast_T* ret_val = init_ast(AST_DOUBLE);
+                    ret_val->token.ast_double = visitor_visit(node->token.ast_factor.left)->token.ast_double / visitor_visit(node->token.ast_factor.right)->token.ast_double;
+                    return ret_val;
                }
                else {
                     printf("%d: Cannot divide types other than int and double on line", node);

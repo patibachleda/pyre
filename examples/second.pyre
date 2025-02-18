@@ -1,6 +1,7 @@
 process void hi3(){
      func(){
           int a = hi4();
+          int a = 2;
           if(a == 2){
                int c = 3;
                print(c);
