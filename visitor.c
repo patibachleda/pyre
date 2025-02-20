@@ -149,6 +149,11 @@ ast_T* visitor_visit_process_call(ast_T* node) {
           for (int i = 0; i < pdef->token.ast_process_definition.func->numNodes; i++) {
                ret_val = visitor_visit(pdef->token.ast_process_definition.func->token.ast_func_definition.body[i]);
                if (pdef->token.ast_process_definition.func->token.ast_func_definition.body[i]->type == AST_EMIT) {
+                    scope_add_emit_variable(
+                         node->local_scope,
+                         pdef->token.ast_helper_definition.body[i],
+                         ret_val
+                    );
                     return ret_val;
                }
           }
@@ -158,7 +163,12 @@ ast_T* visitor_visit_process_call(ast_T* node) {
           for (int i = 0; i < pdef->numNodes; i++) {
                ret_val = visitor_visit(pdef->token.ast_helper_definition.body[i]);
                if (pdef->token.ast_helper_definition.body[i]->type == AST_EMIT) {
-                    return ret_val;
+                    scope_add_emit_variable(
+                         node->local_scope,
+                         pdef->token.ast_helper_definition.body[i],
+                         ret_val
+                    );
+                    return ret_val->token.ast_variable_definition.value;
                }
           }
           return pdef;

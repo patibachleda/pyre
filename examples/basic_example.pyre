@@ -1,36 +1,38 @@
 process void add(){
      func(){
           if( paramsInBoundCheck()){
-               int c = 3 + 2;
-               print("4", c);
+               int a = 3 + 2;
+               print("4", var3);
           } else{
-               int d = 2;
-               print("2",d);
+               int b = 2;
+               print("2",b);
           }
           
-          boolean a = false;
-          string b = "hi";
-          char c = 'f';
-          emit 2;
+          boolean c = false;
+          string d = "hi";
+          char e = 'f';
+          emit var(2);
      }
 
      // you can have if/else statements like this
      // you can also exclude the yes/no and it the inside of the statement will be 'yes'
      helper void paramsInBoundCheck(){
           if (5 + 2 != 0 and 1 == 3/1 or 1 >= 1){
-               int c = 3;
-               print("1", c);
+               int f = 3;
+               print("1", f);
           } else{
-               int d = 1;
-               print("3", d);
+               int g = 1;
+               print("3", g);
           }
+
+          emit var3(true);
      }
 }
 
-process void multiple(){
+process void multiple(int var){
      func(){
-          print();
-          emit 5;
+          print(var);
+          emit var2(5);
      }
 }
 
@@ -41,5 +43,5 @@ process void multiple(){
 // each func is allowed to have helper methods using the helper keyword
 // the main method defines the start of the program flow
 main(){
-     add() -> multiple() -> print();
+     add() -> multiple(var) -> print(var2);
 }

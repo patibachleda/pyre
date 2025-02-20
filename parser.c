@@ -25,8 +25,10 @@ ast_T** parser_parse_statements(parser_T* parser, int* ll_size) {
 
      while (parser->current_token != NULL && parser->current_token->type != TOKEN_RCURLY) { 
           scope_T* process_scope = init_scope();
-          ast_T* statement = parser_parse_statement(parser, process_scope, global_scope, NULL);
+          scope_T* local_scope = init_scope();
+          ast_T* statement = parser_parse_statement(parser, process_scope, global_scope, local_scope);
           statement->process_scope = process_scope;
+          statement->local_scope = local_scope;
           ll_nodes = realloc(ll_nodes, ((*ll_size+1) * sizeof(ast_T*)));
           ll_nodes[*ll_size] = statement;
           *ll_size += 1;
@@ -47,7 +49,7 @@ ast_T* parser_parse_statement(parser_T* parser, scope_T* process_scope, scope_T*
           case TOKEN_STRING_TYPE:
           case TOKEN_CHAR_TYPE:
                return parser_parse_variable_definition(parser, parser->current_token->type, process_scope, global_scope, local_scope);
-          case TOKEN_PROCESS: return parser_parse_process_definition(parser, process_scope, global_scope);
+          case TOKEN_PROCESS: return parser_parse_process_definition(parser, process_scope, global_scope, local_scope);
           case TOKEN_FUNC: return parser_parse_func_definition(parser, process_scope, global_scope, local_scope);
           case TOKEN_HELPER: return parser_parse_helper_definition(parser, process_scope, global_scope, local_scope);
           case TOKEN_EMIT: return parser_parse_emit(parser, process_scope, global_scope, local_scope);
@@ -647,7 +649,20 @@ ast_T* parser_parse_conditional(parser_T* parser, scope_T* process_scope, scope_
 ast_T* parser_parse_emit(parser_T* parser, scope_T* process_scope, scope_T* global_scope, scope_T* local_scope) {
      ast_T* node = init_ast(AST_EMIT);
      parser_move_forward(parser, TOKEN_EMIT);
-     node->token.ast_emit.stmt = parser_parse_statement(parser, process_scope, global_scope, local_scope);
+
+     node->token.ast_emit.stmt = init_ast(AST_VARIABLE_DEFINITION);
+     node->token.ast_emit.stmt->token.ast_variable_definition.name = parser->current_token->value;
+     parser_move_forward(parser, TOKEN_ID);
+     parser_move_forward(parser, TOKEN_LPAREN);
+     ast_T* emit =  parser_parse_statement(parser, process_scope, global_scope, local_scope);
+     parser_move_forward(parser, TOKEN_RPAREN);
+
+     node->token.ast_emit.stmt->token.ast_variable_definition.value = emit;
+     node->token.ast_emit.stmt->local_scope = local_scope;
+     node->token.ast_emit.stmt->global_scope = global_scope;
+     node->token.ast_emit.stmt->process_scope = process_scope;
+
+
      if (parser->current_token->type == TOKEN_SEMICOLON) {
           parser_move_forward(parser, TOKEN_SEMICOLON);
      }

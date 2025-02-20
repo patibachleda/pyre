@@ -133,6 +133,32 @@ ast_T* scope_add_variable_definition(scope_T* scope, ast_T* vdef) {
      return vdef;
 }
 
+ast_T* scope_add_emit_variable(scope_T* scope, ast_T* emit_def, ast_T* emit_value) {
+
+     for (int i = 0; i < scope->variable_definitions_size; i++)
+     {
+          ast_T* temp = scope->variable_definitions[i];
+
+          //if (strcmp(temp->token.ast_emit.stmt->token, emit_def->token.ast_emit.var_name) == 0)
+          //{
+          //     temp->token.ast_emit.stmt = emit_def->token.ast_emit.stmt;
+          //}
+     }
+
+     if (scope->variable_definitions == (void*)0) {
+          scope->variable_definitions = calloc(1, sizeof(struct AST_NODE));
+          scope->variable_definitions[0] = emit_value;
+          scope->variable_definitions_size += 1;
+     }
+     else {
+          scope->variable_definitions_size += 1;
+          scope->variable_definitions = realloc(scope->variable_definitions, scope->variable_definitions_size * sizeof(struct AST_NODE*));
+          scope->variable_definitions[scope->variable_definitions_size - 1] = emit_value;
+     }
+
+     return emit_def;
+}
+
 ast_T* scope_get_variable_definition(scope_T* scope, const char* name) {
      for (int i = 0; i < scope->variable_definitions_size; i++)
      {
