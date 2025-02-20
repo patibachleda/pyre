@@ -2,6 +2,7 @@ process void add(){
      func(){
           if( paramsInBoundCheck()){
                int a = 3 + 2;
+               char var3 = 'v';
                print("4", var3);
           } else{
                int b = 2;

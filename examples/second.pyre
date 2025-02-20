@@ -14,7 +14,7 @@ process void hi3(){
 
      helper void hi4(){
           int d = 2;
-          emit d;
+          emit var(d);
      }
 }
 

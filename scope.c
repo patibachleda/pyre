@@ -22,6 +22,17 @@ scope_T* init_scope() {
 }
 
 ast_T* scope_add_process_definition(scope_T* scope, ast_T* pdef) {
+     for (int i = 0; i < scope->process_definitions_size; i++)
+     {
+          ast_T* temp = scope->process_definitions[i];
+
+          if (strcmp(temp->token.ast_process_definition.name, pdef->token.ast_process_definition.name) == 0)
+          {
+               printf("Process already declared %s\n", pdef->token.ast_process_definition.name);
+               exit(1);
+          }
+     }
+
      if (scope->process_definitions == (void*)0) {
           scope->process_definitions = calloc(1, sizeof(struct AST_NODE*));
           scope->process_definitions[0] = pdef;
@@ -61,16 +72,16 @@ ast_T* scope_get_process_definition(scope_T* global_scope, scope_T* local_scope,
 }
 
 ast_T* scope_add_function_definition(scope_T* scope, ast_T* fdef){
-     //for (int i = 0; i < scope->function_definitions_size; i++)
-     //{
-     //     ast_T* temp = scope->function_definitions[i];
+     for (int i = 0; i < scope->function_definitions_size; i++)
+     {
+          ast_T* temp = scope->function_definitions[i];
 
-     //     if (strcmp(temp->token.ast_fu.name, fdef->token.) == 0)
-     //     {
-     //          printf("Variable already declared %s\n", fdef->token.ast_function_definition.name);
-     //          exit(1);
-     //     }
-     //}
+          if (strcmp(temp->token.ast_helper_definition.name, fdef->token.ast_helper_definition.name) == 0)
+          {
+               printf("Function already declared %s\n", fdef->token.ast_helper_definition.name);
+               exit(1);
+          }
+     }
 
      if (scope->function_definitions == (void*)0) {
           scope->function_definitions = calloc(1, sizeof(struct AST_NODE));
@@ -109,13 +120,6 @@ ast_T* scope_add_variable_definition(scope_T* scope, ast_T* vdef) {
           if (strcmp(temp->token.ast_variable_definition.name, vdef->token.ast_variable_definition.name) == 0)
           {
                temp->token.ast_variable_definition.value = vdef->token.ast_variable_definition.value;
-               //if (temp->token.ast_variable_definition.value->type == AST_PROCESS_CALL) {
-               //     temp->token.ast_variable_definition.value = vdef->token.ast_variable_definition.value;
-               //}
-               //else {
-               //     printf("Variable already declared %s\n", vdef->token.ast_variable_definition.name);
-               //     exit(1);
-               //}
           }
      }
     
@@ -139,10 +143,10 @@ ast_T* scope_add_emit_variable(scope_T* scope, ast_T* emit_def, ast_T* emit_valu
      {
           ast_T* temp = scope->variable_definitions[i];
 
-          //if (strcmp(temp->token.ast_emit.stmt->token, emit_def->token.ast_emit.var_name) == 0)
-          //{
-          //     temp->token.ast_emit.stmt = emit_def->token.ast_emit.stmt;
-          //}
+          if (strcmp(temp->token.ast_variable_definition.name, emit_value->token.ast_variable_definition.name) == 0)
+          {
+               temp->token.ast_emit.stmt = emit_def->token.ast_emit.stmt;
+          }
      }
 
      if (scope->variable_definitions == (void*)0) {
