@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include "include/lexer.h"
 #include "include/parser.h"
 #include "include/token.h"
@@ -40,6 +41,10 @@ int main(int argc, char* argv[]) {
                int len = (int) strlen(argv[i]);
                char* last_four = &argv[i][len - 5];
                if (strcmp(last_four, ".pyre") == 0) {
+                    clock_t start, end;
+                    double cpu_time_used;
+                    start = clock();
+
                     char* file = get_file_contents(argv[i]);
                     int list_size = 0;
 
@@ -50,6 +55,10 @@ int main(int argc, char* argv[]) {
                     for (int i = 0; i < list_size; i++) {
                          visitor_visit(list[i]);
                     }
+
+                    end = clock();
+                    cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC; // Calculate time difference in seconds
+                    printf("\n\nTime taken: %f seconds\n", cpu_time_used);
                }
                else {
                     printf("Usage: pyre <filename>\n");

@@ -29,9 +29,9 @@ process void add(){
      }
 }
 
-process void multiple(int var){
+process void multiple(){
      func(){
-          print(var);
+          // print(var);
           emit var2(5);
      }
 }
