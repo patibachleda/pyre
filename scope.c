@@ -145,7 +145,8 @@ ast_T* scope_add_emit_variable(scope_T* scope, ast_T* emit_def, ast_T* emit_valu
 
           if (strcmp(temp->token.ast_variable_definition.name, emit_value->token.ast_variable_definition.name) == 0)
           {
-               temp->token.ast_emit.stmt = emit_def->token.ast_emit.stmt;
+               temp->token.ast_variable_definition.value = emit_value->token.ast_variable_definition.value;
+               return emit_def;
           }
      }
 

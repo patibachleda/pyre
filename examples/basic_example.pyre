@@ -30,9 +30,9 @@ process void add(){
      }
 }
 
-process void multiple(){
+process int multiple(int var){
      func(){
-          // print(var);
+          print(var);
           emit var2(5);
      }
 }

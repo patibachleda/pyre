@@ -59,7 +59,7 @@ ast_T* visitor_visit(ast_T* node) {
                return node; break;
           default: printf("Unknown node type %d \n", node->type); break;
      }
-
+ 
 }
 
 ast_T* visitor_visit_main(ast_T* node) {
@@ -172,7 +172,7 @@ ast_T* visitor_visit_process_call(ast_T* node) {
                ret_val = visitor_visit(pdef->token.ast_process_definition.func->token.ast_func_definition.body[i]);
                if (pdef->token.ast_process_definition.func->token.ast_func_definition.body[i]->type == AST_EMIT) {
                     scope_add_emit_variable(
-                         node->local_scope,
+                         node->global_scope,
                          pdef->token.ast_helper_definition.body[i],
                          ret_val
                     );
@@ -505,9 +505,20 @@ ast_T* visitor_visit_unnamed_arg(ast_T* node, int order, ast_T** process_args) {
           process_args[order]->token.ast_declared_arg.variable_definition->token.ast_variable_definition.name
      );
 
-     expr->token.ast_variable_definition.value = node->token.ast_unnamed_arg.expression;
+     ast_T* val = node->token.ast_unnamed_arg.expression;
 
-     return visitor_visit(expr);
+     if (node->token.ast_unnamed_arg.expression->type == AST_VARIABLE) {
+          val = scope_get_variable_definition(
+               node->local_scope,
+               node->process_scope,
+               node->global_scope,
+               node->token.ast_unnamed_arg.expression->token.ast_variable.name
+          )->token.ast_variable_definition.value;
+     }
+
+     expr->token.ast_variable_definition.value = val;
+
+     return visitor_visit(expr->token.ast_variable_definition.value);
 }
 
 ast_T* visitor_visit_named_arg(ast_T* node) {
