@@ -49,7 +49,7 @@ ast_T* parser_parse_statement(parser_T* parser, scope_T* process_scope, scope_T*
           case TOKEN_STRING_TYPE:
           case TOKEN_CHAR_TYPE:
                return parser_parse_variable_definition(parser, parser->current_token->type, process_scope, global_scope, local_scope);
-          case TOKEN_PROCESS: return parser_parse_process_definition(parser, process_scope, global_scope, local_scope);
+          case TOKEN_PROCESS: return parser_parse_process_definition(parser, process_scope, global_scope);
           case TOKEN_FUNC: return parser_parse_func_definition(parser, process_scope, global_scope, local_scope);
           case TOKEN_HELPER: return parser_parse_helper_definition(parser, process_scope, global_scope, local_scope);
           case TOKEN_EMIT: return parser_parse_emit(parser, process_scope, global_scope, local_scope);
@@ -350,10 +350,21 @@ ast_T* parser_parse_arguments_declared(parser_T* parser, scope_T* process_scope,
 
      while (parser->current_token->type != TOKEN_RPAREN) {
           node->token.ast_arg_list.args = realloc(node->token.ast_arg_list.args, (num + 1) * sizeof(ast_T*));
+
           ast_T* arg = init_ast(AST_DECLARED_ARG);
-          arg->token.ast_declared_arg.type = parser->current_token->value;
+          ast_T* var = init_ast(AST_VARIABLE_DEFINITION);
+          var->token.ast_variable_definition.type =parser->current_token->value;
           parser_move_forward(parser, parser->current_token->type);
-          arg->token.ast_declared_arg.name = parser->current_token->value;
+          var->token.ast_variable_definition.name = parser->current_token->value;
+          var->local_scope = local_scope;
+          var->global_scope = global_scope;
+          var->process_scope = process_scope;
+          arg->token.ast_declared_arg.variable_definition = var;
+
+          arg->local_scope = local_scope;
+          arg->global_scope = global_scope;
+          arg->process_scope = process_scope;
+
           node->token.ast_arg_list.args[num] = arg;
           parser_move_forward(parser, TOKEN_ID);
           num += 1;
@@ -387,18 +398,20 @@ ast_T* parser_parse_arguments_called(parser_T* parser, scope_T* process_scope, s
 
           if (parser->lexer->current_char ==  ':') { // if named arg
                arg = init_ast(AST_NAMED_ARG);
-               arg->token.ast_named_arg.name = parser->prev_token->value;
+               arg->token.ast_named_arg.name = parser->current_token->value;
                parser_move_forward(parser, TOKEN_ID);
                parser_move_forward(parser, TOKEN_COLON);
                arg->token.ast_named_arg.expression = parser_parse_statement(parser, process_scope, global_scope, local_scope);
                arg->local_scope = local_scope;
                arg->global_scope = global_scope;
+               arg->process_scope = process_scope;
           }
           else { // if unnamed arg
                arg = init_ast(AST_UNNAMED_ARG);
                arg->token.ast_unnamed_arg.expression = parser_parse_statement(parser, process_scope, global_scope, local_scope);
                arg->local_scope = local_scope;
                arg->global_scope = global_scope;
+               arg->process_scope = process_scope;
           }
           node->token.ast_arg_list.args[num] = arg;
           num += 1;

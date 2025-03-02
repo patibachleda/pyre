@@ -256,14 +256,14 @@ token_T* lexer_parse_number(lexer_T* lexer) {
           }
 
 
-          if (strcmp(lexer_get_current_char_as_string(lexer), ";") != 0 && strcmp(lexer_get_current_char_as_string(lexer), ";") != 0) { // expression
+          if (strcmp(lexer_get_current_char_as_string(lexer), ";") != 0 && strcmp(lexer_get_current_char_as_string(lexer), ";") != 0 && strcmp(lexer_get_current_char_as_string(lexer), ",") != 0) { // expression
                return init_token(TOKEN_EXPRESSION_DOUBLE, string, get_line_num(lexer));
           }
 
           return init_token(TOKEN_DOUBLE, string, get_line_num(lexer));
      }
 
-     if (strcmp(lexer_get_current_char_as_string(lexer), ";") != 0 && strcmp(lexer_get_current_char_as_string(lexer), ")") != 0) { // expression
+     if (strcmp(lexer_get_current_char_as_string(lexer), ";") != 0 && strcmp(lexer_get_current_char_as_string(lexer), ")") != 0 && strcmp(lexer_get_current_char_as_string(lexer), ",") != 0) { // expression
           return init_token(TOKEN_EXPRESSION_INT, string, get_line_num(lexer));
      }
 
@@ -316,6 +316,7 @@ char* lexer_get_current_char_as_string(lexer_T* lexer) {
 
 char* lexer_get_next_char_as_string(lexer_T* lexer) {
      char* current_char_as_string = calloc(2, sizeof(char));
+     lexer_skip_whitespace(lexer);
 
      if (current_char_as_string) {
           current_char_as_string[0] = lexer_look_forward(lexer);

@@ -2,29 +2,33 @@ process int add(int a, int b){
      func(){
           paramsInBoundCheck();
           if (isParamInBound){
-               emit c+d;
+               int returnVal = a + 1;
           } else {
-           // do something else
+               int returnVal = a + 2;
           }
           
-          emit data1(e+f);
+          emit data1(returnVal);
      }
 
      // you can have if/else statements like this
      // you can also exclude the yes/no and it the inside of the statement will be 'yes'
      helper boolean paramsInBoundCheck(){
-          if (a < 10 and b < 5){
-               emit isParamInBound(true);
+          print("a", a);
+          print("b", b);
+          if (1 < 10 and 1 < 5){
+               boolean returnVal = true;
           } else {
-               emit isParamInBound(false);
+               boolean returnVal = false;
           }
+          
+          emit isParamInBound(returnval);
      }
 }
 
 process int multiple(int data1){
      func(){
-          print();
-          emit data2(data1 * 5);
+          print("data1", data1);
+          emit data2(data1);
      }
 }
 

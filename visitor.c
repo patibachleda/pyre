@@ -7,7 +7,7 @@
 
 static pyre_print(ast_T** args, int args_size) {
      for (int i = 0; i < args_size; i++) {
-          ast_T* visited_ast = visitor_visit(args[i]);
+          ast_T* visited_ast = visitor_visit(args[i]->token.ast_unnamed_arg.expression);
           switch (visited_ast->type)
           {
                case AST_STRING: printf("%s ", visited_ast->token.ast_string); break;
@@ -47,7 +47,9 @@ ast_T* visitor_visit(ast_T* node) {
           case AST_UNARY: visitor_visit_unary(node);  break;
 
           case AST_ARG_LIST: visitor_visit_arg_list(node); break;
-          case AST_UNNAMED_ARG: visitor_visit_unnamed_arg(node); break;
+          //case AST_UNNAMED_ARG: visitor_visit_unnamed_arg(node); break;
+          //case AST_NAMED_ARG: visitor_visit_named_arg(node); break;
+          case AST_DECLARED_ARG: visitor_visit_declared_arg(node); break;
 
           case AST_INT: 
           case AST_DOUBLE:
@@ -57,6 +59,7 @@ ast_T* visitor_visit(ast_T* node) {
                return node; break;
           default: printf("Unknown node type %d \n", node->type); break;
      }
+
 }
 
 ast_T* visitor_visit_main(ast_T* node) {
@@ -72,6 +75,10 @@ ast_T* visitor_visit_process_definition(ast_T* node) {
           node->global_scope,
           node
      );
+
+     for (int j = 0; j < node->token.ast_process_definition.args->numNodes; j++) {
+          ast_T* arg = visitor_visit(node->token.ast_process_definition.args->token.ast_arg_list.args[j]);
+     }
 
      // add helpers
      for (int i = 0; i < node->numNodes; i++) {
@@ -114,6 +121,8 @@ ast_T* visitor_visit_variable_definition(ast_T* node) {
 ast_T* visitor_visit_variable(ast_T* node) {
      ast_T* vdef = scope_get_variable_definition(
           node->local_scope,
+          node->process_scope,
+          node->global_scope,
           node->token.ast_variable.name
      );
 
@@ -136,6 +145,19 @@ ast_T* visitor_visit_process_call(ast_T* node) {
           node->process_scope,
           node->token.ast_process_call.name
      );
+
+     for (int i = 0; i < node->token.ast_process_call.args->numNodes; i++) {
+          if (node->token.ast_process_call.args->token.ast_arg_list.args[i]->type == AST_NAMED_ARG) {
+               visitor_visit_named_arg(node->token.ast_process_call.args->token.ast_arg_list.args[i]);
+          }
+          else if (node->token.ast_process_call.args->token.ast_arg_list.args[i]->type == AST_UNNAMED_ARG) {
+               visitor_visit_unnamed_arg(node->token.ast_process_call.args->token.ast_arg_list.args[i], i, pdef->token.ast_process_definition.args->token.ast_arg_list.args);
+
+          }
+          else {
+               printf("Something went wrong during a process call");
+          }
+     }
 
      if (pdef == (void*)0) {
 
@@ -173,6 +195,8 @@ ast_T* visitor_visit_process_call(ast_T* node) {
           }
           return pdef;
      }
+
+     return NULL;
 }
 
 ast_T* visitor_visit_emit(ast_T* node) {
@@ -371,13 +395,13 @@ ast_T* visitor_visit_comparison(ast_T* node) {
           }
      }
 
-     return visitor_visit(node->token.ast_comparison.left, 1);
+     return visitor_visit(node->token.ast_comparison.left);
 }
 
 ast_T* visitor_visit_term(ast_T* node) {
      if (node->token.ast_term.operator != NULL) {
-          ast_T* eval_left = visitor_visit(node->token.ast_term.left, 1);
-          ast_T* eval_right = visitor_visit(node->token.ast_term.right, 1);
+          ast_T* eval_left = visitor_visit(node->token.ast_term.left);
+          ast_T* eval_right = visitor_visit(node->token.ast_term.right);
           if (strcmp(node->token.ast_term.operator, "+") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
                     ast_T* ret_val = init_ast(AST_INT);
@@ -417,8 +441,8 @@ ast_T* visitor_visit_term(ast_T* node) {
 
 ast_T* visitor_visit_factor(ast_T* node) {
      if (node->token.ast_factor.operator != NULL) {
-          ast_T* eval_left = visitor_visit(node->token.ast_factor.left, 1);
-          ast_T* eval_right = visitor_visit(node->token.ast_factor.right, 1);
+          ast_T* eval_left = visitor_visit(node->token.ast_factor.left);
+          ast_T* eval_right = visitor_visit(node->token.ast_factor.right);
           if (strcmp(node->token.ast_factor.operator, "*") == 0) {
                if (eval_left->type == AST_INT && eval_right->type == AST_INT) {
                     ast_T* ret_val = init_ast(AST_INT);
@@ -447,7 +471,7 @@ ast_T* visitor_visit_factor(ast_T* node) {
                     return ret_val;
                }
                else {
-                    printf("%d: Cannot divide types other than int and double on line", node);
+                    printf("Cannot divide types other than int and double on line");
                     exit(3);
                }
           }
@@ -468,25 +492,42 @@ ast_T* visitor_visit_unary(ast_T* node) {
 
 ast_T* visitor_visit_arg_list(ast_T* node) {
      for (int i = 0; i < node->token.ast_process_call.args->numNodes; i++) {
-          ast_T* asList[1];
-          switch (node->token.ast_process_call.args->token.ast_arg_list.args[i]->type) {
-               case AST_UNNAMED_ARG:
-                    asList[0] = node->token.ast_process_call.args->token.ast_arg_list.args[i]->token.ast_unnamed_arg.expression;
-                    return visitor_visit(asList);
-                    break;
-               case AST_NAMED_ARG:
-                    asList[0] = node->token.ast_process_call.args->token.ast_arg_list.args[i]->token.ast_named_arg.expression;
-                    return visitor_visit(asList);
-                    break;
-               case AST_DECLARED_ARG:
-                    break;
-               default: printf("%p\n", node->token.ast_process_call.args[i]); break;
-          }
+          printf("arg %d", i);
      }
 
 }
 
-ast_T* visitor_visit_unnamed_arg(ast_T* node) {
-     ast_T* expr = node->token.ast_unnamed_arg.expression;
+ast_T* visitor_visit_unnamed_arg(ast_T* node, int order, ast_T** process_args) {
+     ast_T* expr = scope_get_variable_definition(
+          node->local_scope,
+          node->process_scope,
+          node->global_scope,
+          process_args[order]->token.ast_declared_arg.variable_definition->token.ast_variable_definition.name
+     );
+
+     expr->token.ast_variable_definition.value = node->token.ast_unnamed_arg.expression;
+
      return visitor_visit(expr);
+}
+
+ast_T* visitor_visit_named_arg(ast_T* node) {
+     ast_T* expr = scope_get_variable_definition(
+          node->local_scope,
+          node->process_scope,
+          node->global_scope,
+          node->token.ast_named_arg.name
+     );
+
+     expr->token.ast_variable_definition.value = node->token.ast_named_arg.expression;
+
+     return visitor_visit(expr);
+}
+
+ast_T* visitor_visit_declared_arg(ast_T* node) {
+     scope_add_variable_definition(
+          node->process_scope,
+          node->token.ast_declared_arg.variable_definition
+     );
+
+     return visitor_visit(node->token.ast_declared_arg.variable_definition);
 }

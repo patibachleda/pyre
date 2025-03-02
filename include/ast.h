@@ -71,7 +71,7 @@ struct AST_NODE {
           struct AST_ARG_LIST { ast_T** args; } ast_arg_list;
           struct AST_NAMED_ARG { char* name; ast_T* expression; } ast_named_arg;
           struct AST_UNNAMED_ARG { ast_T* expression; } ast_unnamed_arg;
-          struct AST_DECLARED_ARG { char* type;  char* name; } ast_declared_arg;
+          struct AST_DECLARED_ARG { ast_T* variable_definition;  } ast_declared_arg;
 
           char* ast_string;
           char ast_character;

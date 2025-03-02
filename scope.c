@@ -163,10 +163,30 @@ ast_T* scope_add_emit_variable(scope_T* scope, ast_T* emit_def, ast_T* emit_valu
      return emit_def;
 }
 
-ast_T* scope_get_variable_definition(scope_T* scope, const char* name) {
-     for (int i = 0; i < scope->variable_definitions_size; i++)
+ast_T* scope_get_variable_definition(scope_T* local_scope, scope_T* process_scope, scope_T* global_scope, const char* name) {
+     for (int i = 0; i < local_scope->variable_definitions_size; i++)
      {
-          ast_T* vdef = scope->variable_definitions[i];
+          ast_T* vdef = local_scope->variable_definitions[i];
+
+          if (strcmp(vdef->token.ast_variable_definition.name, name) == 0)
+          {
+               return vdef;
+          }
+     }
+
+     for (int i = 0; i < process_scope->variable_definitions_size; i++)
+     {
+          ast_T* vdef = process_scope->variable_definitions[i];
+
+          if (strcmp(vdef->token.ast_variable_definition.name, name) == 0)
+          {
+               return vdef;
+          }
+     }
+
+     for (int i = 0; i < global_scope->variable_definitions_size; i++)
+     {
+          ast_T* vdef = global_scope->variable_definitions[i];
 
           if (strcmp(vdef->token.ast_variable_definition.name, name) == 0)
           {

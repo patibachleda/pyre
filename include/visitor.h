@@ -38,10 +38,10 @@ ast_T* visitor_visit_unary(ast_T* node);
 
 ast_T* visitor_visit_arg_list(ast_T* node);
 
-ast_T* visitor_visit_named_arg(ast_T* node);
-
-ast_T* visitor_visit_unnamed_arg(ast_T* node);
-
 ast_T* visitor_visit_declared_arg(ast_T* node);
+
+ast_T* visitor_visit_unnamed_arg(ast_T* node, int order, ast_T** process_args);
+
+ast_T* visitor_visit_named_arg(ast_T* node);
 
 #endif
