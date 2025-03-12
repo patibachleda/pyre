@@ -2,9 +2,9 @@ process int add(int a, int b){
      func(){
           paramsInBoundCheck();
           if (isParamInBound){
-               int returnVal = a + 1;
+               int returnVal = 1 + 1;
           } else {
-               int returnVal = a + 2;
+               int returnVal = 2 + 2;
           }
           
           emit data1(returnVal);
@@ -21,7 +21,7 @@ process int add(int a, int b){
                boolean returnVal = false;
           }
           
-          emit isParamInBound(returnval);
+          emit isParamInBound(returnVal);
      }
 }
 
